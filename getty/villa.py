@@ -1,6 +1,7 @@
 from os import chdir
 
 import config
+import time
 from tools import ex, git, mvn, os
 
 
@@ -32,18 +33,18 @@ def visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash, pkg_prefix="-"):
     print "current working directory: " + pwd + "\n"
     
     diff_out = go + "text.diff"
+    start = time.time()
     os.sys_call(" ".join(["git diff",
                           str(config.git_diff_extra_ops),
                           "{0} {1} > {2}"]).format(prev_hash, post_hash, diff_out))
-    
+    print "villa:: git diff "+ str((time.time() - start))
     '''
         1-st pass: checkout prev_commit as detached head, and get all sets and etc, in simple (bare) mode (-s)
             remember to clear after this pass
     '''
+    start = time.time()
     bin_path, src_rel_path, test_src_rel_path = checkout_build(proj_dir, prev_hash)
-    print "******" + go
-    print "******" + prev_hash
-    print "******" + post_hash
+    print "villa::: checkoutbuild"+ str((time.time() - start))
     run_villa = "java -jar {0} -s {1} {2} {3} {4} {5} {6} -o {7}".format(
         villa_path, diff_out, bin_path, test_src_rel_path, pkg_prefix, prev_hash, post_hash, go)
     run_villa_l4ms = "java -jar {0} -l {1} {2} {3} -o {4}".format(
@@ -53,7 +54,7 @@ def visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash, pkg_prefix="-"):
     os.sys_call(run_villa)
     os.sys_call(run_villa_l4ms)
     chdir(pwd)
-    
+
     old_changed_methods = ex.read_str_from(go + "_getty_chgmtd_src_old_{0}_.ex".format(prev_hash))
     old_all_methods = ex.read_str_from(go + "_getty_allmtd_src_{0}_.ex".format(prev_hash))
     old_l2m = ex.read_str_from(go + "_getty_fl2m_{0}_.ex".format(prev_hash))
@@ -65,9 +66,9 @@ def visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash, pkg_prefix="-"):
 #     print old_l2m
 #     print old_m2l
 #     print old_changed_tests
-    
+    start = time.time()
     git.clear_temp_checkout(prev_hash)
-    
+    print "villa;:: clear temp checkout "+ str((time.time() - start))
     '''
         2-nd pass: checkout post_commit as detached head, and get all sets and etc, in complex mode (-c)
             remember to clear after this pass
@@ -80,10 +81,14 @@ def visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash, pkg_prefix="-"):
         villa_path, src_rel_path, test_src_rel_path, post_hash, go)
     print "\n\nstart to run Villa ... \n\n" + run_villa + "\n  and  \n" + run_villa_l4ms
     chdir(proj_dir)
+    start = time.time()
     os.sys_call(run_villa)
     os.sys_call(run_villa_l4ms)
+
+    print "villa:: run_villa" + str((time.time() - start))
     chdir(pwd)
     
+    start = time.time()
     new_changed_methods = ex.read_str_from(go + "_getty_chgmtd_src_new_{0}_.ex".format(post_hash))
     new_improved_changed_methods = ex.read_str_from(go + "_getty_chgmtd_src_{0}_{1}_.ex".format(prev_hash, post_hash))
     new_removed_changed_methods = ex.read_str_from(go + "_getty_chgmtd_src_gone_{0}_{1}_.ex".format(prev_hash, post_hash))
@@ -96,6 +101,7 @@ def visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash, pkg_prefix="-"):
     new_inner_dataflow_methods = ex.read_str_from(go + "_getty_dfinner_{0}_.ex".format(post_hash))
     new_outer_dataflow_methods = ex.read_str_from(go + "_getty_dfouter_{0}_.ex".format(post_hash))
     new_changed_tests = ex.read_str_from(go + "_getty_chgmtd_test_new_{0}_.ex".format(post_hash))
+    print "villa:: read_str_from"+ str((time.time() - start))
 #     # DEBUG ONLY
 #     print new_changed_methods
 #     print new_improved_changed_methods
