@@ -143,14 +143,21 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
     all_to_consider = set(target_set)
     if config.class_level_expansion:
         all_to_consider = (all_to_consider | expansion)
-    
+
+    classes_to_consider = set()
     for tgt in all_to_consider:
+        class_ref = tgt.split(':')[0]
+        classes_to_consider.add(class_ref)
+
+    print "==== classes to consider: ", classes_to_consider
+    for tgt in classes_to_consider:
+        print "============ target is: " + tgt + ", pattern is: "+ daikon.dpformat_with_sigs(tgt) +" ==============="
         target_ff = daikon.fsformat_with_sigs(tgt)
         out_file = go+"_getty_inv__"+target_ff+"__"+this_hash+"_.inv.out"
         run_printinv = \
             " ".join([java_cmd, "daikon.PrintInvariants",
                       "--format", config.output_inv_format,
-                      "--ppt-select-pattern=\'"+daikon.dpformat_with_sigs(tgt)+"\'",
+                      "--ppt-select-pattern=\'"+daikon.dpformat_with_sigs(tgt)[:-1]+"[.:]"+"\'",
                       "--output", out_file, inv_gz])
         if SHOW_DEBUG_INFO:
             current_count += 1
@@ -164,7 +171,52 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
             print "\n=== Daikon:PrintInvs command to run: \n" + run_printinv
         os.sys_call(run_printinv, ignore_bad_exit=True)
         sort_txt_inv(out_file)
+
+        result = create_inv_out_file_per_method(out_file, all_to_consider, this_hash, go)
+        if result is False:
+            print "create_inv_out_file_per_method returned False"
+
     os.remove_file(inv_gz)
+
+
+def create_inv_out_file_per_method(out_file, methods_to_consider, this_hash, go):
+    f = open(out_file, "r")
+
+    if f.mode != 'r':
+        print "WARN: file not opened in read mode"
+        return False
+
+    invariants = f.read()
+    f.close()
+
+    inv_array = invariants.split("\n================\n")
+
+    for tgt in methods_to_consider:
+        regex = daikon.dpformat_with_sigs(tgt)[1:]
+        target_ff = daikon.fsformat_with_sigs(tgt)
+        out_file = go + "_getty_inv__" + target_ff + "__" + this_hash + "_.inv.out"
+
+        # print "tgt", tgt, "regex:", regex, "out_file", out_file
+
+        file_created = False
+        for inv in inv_array:
+            # if "\n"+tgt+":::" in inv:
+            if re.search(regex, inv):
+
+                print "=== writing: " + out_file
+                f = open(out_file, "a+")
+                file_created = True
+
+                f.write("\n================\n")
+                f.write(inv)
+                f.close()
+
+        if file_created is False:
+            f = open(out_file, "a+")
+            f.write("<NO INVARIANTS FOUND>")
+            f.close()
+
+    return True
 
 
 def get_expansion_set(go):
