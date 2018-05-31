@@ -7,7 +7,7 @@ import config
 from tools.ex import read_str_from
 
 
-def investigate(go, agent_path, old_all_methods, new_all_methods, prev_hash, post_hash):
+def investigate(old_all_methods, new_all_methods):
     all_interested = set(old_all_methods + new_all_methods)
     return all_interested
 
@@ -49,7 +49,7 @@ def pred_succ(go, ahash):
     return construct_invocation_map(the_file)
 
 
-def get_test_set_dyn(target_set, callee_of, junit_torun):
+def get_test_set_dyn(callee_of, junit_torun):
     test_set = set()
     all_test_classes = junit_torun.split(" ")[1:]
     for possible_test_mtd in callee_of.keys():

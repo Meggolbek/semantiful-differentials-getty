@@ -210,7 +210,7 @@ def main(path=None, flag=None, prev=None, post=None, target=None):
         daikon_display_args = " ".join(
             ["--no_show_progress", "--no_text_output", "--omit_from_output 0r",
              "--format "+config.output_inv_format])
-        select_pattern = daikon.dfformat_full_ordered(set([target]))
+        select_pattern = daikon.dfformat_full_ordered(set([target]), False)
         inv_gz_old = go + "_getty_eval_invs_old_.inv.gz"
         inv_gz_new = go + "_getty_eval_invs_new_.inv.gz"
         daikon_cmd_old = " ".join(

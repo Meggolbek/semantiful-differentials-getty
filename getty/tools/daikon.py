@@ -366,74 +366,105 @@ def dfformat_full(target_set):
 
 
 # reformat all methods together so it is recognizable by Daikon filter
-def dfformat_full_ordered(target_set):
-    parent_interest_set = set()
+def dfformat_full_ordered(target_set, test_selection):
+    # if test selection, add methods nad tests from target set only
     method_interest_set = set()
-    for target in target_set:
-        target = real_name(target)
-        colon_index = target.rfind(":")
-        if colon_index == -1:
-            # includes class and class.*
-            parent_interest_set.add(
-                "^" +
-                target.replace(":", ".").replace(".", "\.").replace("$", "\$")
-                    .replace("[", "\[").replace("]", "\]").replace("<", "\<").replace(">", "\>") +
-                ":")
-        else:
-            possible_parent = target[:colon_index].replace(":", ".")
-            parent_interest_set.add(
-                ("^" + possible_parent + ":").replace(".", "\.").replace("$", "\$")
+    if test_selection:
+        for target in target_set:
+            target = real_name(target)
+            itself = target.replace(":", ".")
+            first_leftp = itself.find("(")
+            if first_leftp != -1:
+                itself = itself[:first_leftp]
+            method_interest_set.add(
+                ("^" + itself + "\(").replace(".", "\.").replace("$", "\$")
                     .replace("[", "\[").replace("]", "\]").replace("<", "\<").replace(">", "\>"))
-            if config.class_level_expansion:
-                method_interest_set.add(
-                    ("^" + possible_parent + ".*").replace(".", "\.").replace("$", "\$")
-                        .replace("[", "\[").replace("]", "\]").replace("<", "\<").replace(">", "\>"))
-            else:
-                itself = target.replace(":", ".")
-                first_leftp = itself.find("(")
-                if first_leftp != -1:
-                    itself = itself[:first_leftp]
-                method_interest_set.add(
-                    ("^" + itself + "\(").replace(".", "\.").replace("$", "\$")
-                        .replace("[", "\[").replace("]", "\]").replace("<", "\<").replace(">", "\>"))
-    parent_pattern = "|".join(parent_interest_set)
-    method_pattern = "|".join(method_interest_set)
-    if parent_pattern == '' and method_pattern == '':
-        return 'GETTY_WARNING_THIS_PATTERN_SHOULD_NOT_EXIST'
-    elif parent_pattern == '':
-        return method_pattern
-    elif method_pattern == '':
-        return parent_pattern
+        method_pattern = "|".join(method_interest_set)
+        if method_pattern == '':
+            return 'GETTY_WARNING_THIS_PATTERN_SHOULD_NOT_EXIST'
+        else:
+            return method_pattern
+    #else add every class, method, and test
     else:
-        return parent_pattern + "|" + method_pattern
+        parent_interest_set = set()
+        for target in target_set:
+            target = real_name(target)
+            colon_index = target.rfind(":")
+            if colon_index == -1:
+                # includes class and class.*
+                parent_interest_set.add(
+                    "^" +
+                    target.replace(":", ".").replace(".", "\.").replace("$", "\$")
+                    .replace("[", "\[").replace("]", "\]").replace("<", "\<").replace(">", "\>") +
+                    ":")
+            else:
+                possible_parent = target[:colon_index].replace(":", ".")
+                parent_interest_set.add(
+                    ("^" + possible_parent + ":").replace(".", "\.").replace("$", "\$")
+                        .replace("[", "\[").replace("]", "\]").replace("<", "\<").replace(">", "\>"))
+                if config.class_level_expansion:
+                    method_interest_set.add(
+                        ("^" + possible_parent + ".*").replace(".", "\.").replace("$", "\$")
+                            .replace("[", "\[").replace("]", "\]").replace("<", "\<").replace(">", "\>"))
+                else:
+                    itself = target.replace(":", ".")
+                    first_leftp = itself.find("(")
+                    if first_leftp != -1:
+                        itself = itself[:first_leftp]
+                    method_interest_set.add(
+                        ("^" + itself + "\(").replace(".", "\.").replace("$", "\$")
+                            .replace("[", "\[").replace("]", "\]").replace("<", "\<").replace(">", "\>"))
+        parent_pattern = "|".join(parent_interest_set)
+        method_pattern = "|".join(method_interest_set)
+        if parent_pattern == '' and method_pattern == '':
+            return 'GETTY_WARNING_THIS_PATTERN_SHOULD_NOT_EXIST'
+        elif parent_pattern == '':
+            return method_pattern
+        elif method_pattern == '':
+            return parent_pattern
+        else:
+            return parent_pattern + "|" + method_pattern
 
 
 # reformat all methods together so it is recognizable by Daikon filter
 # get more than the method name because we replace "(" with "*"
-def dfformat_full_ordered_more(target_set):
-    parent_interest_set = set()
+def dfformat_full_ordered_more(target_set, test_selection):
+    #if test selection, add methods nad tests from target set only
     method_interest_set = set()
-    for target in target_set:
-        target = real_name(target)
-        colon_index = target.rfind(":")
-        if colon_index == -1:
-            # includes class and class.*
-            parent_interest_set.add("^" + target.replace(":", ".").replace(".", "\.").replace("$", "\$") + ":")
-        else:
-            possible_parents = target[:colon_index].replace(":", ".")
+    if test_selection:
+        for target in target_set:
+            target = real_name(target)
             itself = target.replace(":", ".")
-            parent_interest_set.add(("^" + possible_parents + ":").replace(".", "\.").replace("$", "\$"))
             method_interest_set.add(("^" + itself + "*").replace(".", "\.").replace("$", "\$"))
-    parent_pattern = "|".join(parent_interest_set)
-    method_pattern = "|".join(method_interest_set)
-    if parent_pattern == '' and method_pattern == '':
-        return 'GETTY_WARNING_THIS_PATTERN_SHOULD_NOT_EXIST'
-    elif parent_pattern == '':
-        return method_pattern
-    elif method_pattern == '':
-        return parent_pattern
+        method_pattern = "|".join(method_interest_set)
+        if method_pattern == '':
+            return 'GETTY_WARNING_THIS_PATTERN_SHOULD_NOT_EXIST'
+        else:
+            return method_pattern
+    #else add every class, method, and test
     else:
-        return parent_pattern + "|" + method_pattern
+        parent_interest_set = set()
+        for target in target_set:
+            target = real_name(target)
+            colon_index = target.rfind(":")
+            if colon_index == -1:
+                # includes class and class.*
+                parent_interest_set.add("^" + target.replace(":", ".").replace(".", "\.").replace("$", "\$") + ":")
+            else:
+                possible_parents = target[:colon_index].replace(":", ".")
+                itself = target.replace(":", ".")
+                parent_interest_set.add(("^" + possible_parents + ":").replace(".", "\.").replace("$", "\$"))
+                method_interest_set.add(("^" + itself + "*").replace(".", "\.").replace("$", "\$"))
+        parent_pattern = "|".join(parent_interest_set)
+        method_pattern = "|".join(method_interest_set)
+        if parent_pattern == '' and method_pattern == '':
+            return 'GETTY_WARNING_THIS_PATTERN_SHOULD_NOT_EXIST'
+        elif parent_pattern == '':
+            return method_pattern
+        elif method_pattern == '':
+            return parent_pattern
+        else:
+            return parent_pattern + "|" + method_pattern
 
 
 # extended filter (secure)

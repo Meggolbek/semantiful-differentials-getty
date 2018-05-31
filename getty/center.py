@@ -57,7 +57,7 @@ def sort_txt_inv(out_file):
 
 
 # get class-level expanded target set
-def all_methods_expansion(candidates, target_set, go, this_hash, index, java_cmd, inv_gz):
+def all_methods_expansion(candidates, go, this_hash, index, java_cmd, inv_gz):
     exp_tmp = go + "expansion_temp." + this_hash + "." + str(index) + ".allinvs"
     run_print_allinvs = " ".join([java_cmd, "daikon.PrintInvariants", "--output", exp_tmp, inv_gz])
     os.sys_call(run_print_allinvs, ignore_bad_exit=True)
@@ -88,13 +88,18 @@ def all_methods_expansion(candidates, target_set, go, this_hash, index, java_cmd
 
 
 # v4. flexible to be run in parallel, in daikon-online mode
-def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, consider_expansion):
+def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, consider_expansion, test_selection):
     
     index = target_set_index_pair[1]
     target_set = target_set_index_pair[0]
-    
+    #if test selection remove class from target set
+    if test_selection:
+        ttarget_set = set(target_set)
+        for s in ttarget_set:
+            if not s.__contains__(":"):
+                target_set.remove(s)
 #     select_pattern = daikon.select_full(target_set)
-    select_pattern = daikon.dfformat_full_ordered(target_set)
+    select_pattern = daikon.dfformat_full_ordered(target_set, test_selection)
     print "\n=== select pattern ===\n" + select_pattern + "\n"
     
     inv_gz = go + "_getty_inv_" + this_hash + "_." + index
@@ -130,11 +135,11 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
     #start = time.time()
     os.sys_call(run_chicory_daikon, ignore_bad_exit=True)
     #print "center run_chickory_daikon"+ str((time.time() - start))
-    
+
     expansion = set()
     if consider_expansion and config.class_level_expansion:
         try:
-            all_methods_expansion(expansion, target_set, go, this_hash, index, java_cmd, inv_gz)
+            all_methods_expansion(expansion, go, this_hash, index, java_cmd, inv_gz)
         except:
             pass
     
@@ -245,13 +250,6 @@ def one_info_pass(
     start = time.time()
     start1 = time.time()
     junit_torun = mvn.junit_torun_str(cust_mvn_repo)
-    print "center info:: junit_to_run_str " + str((time.time() - start1))
-    #start1 = time.time()
-    junit_tests = junit_torun.split(" ")
-    #print "center info:: junit_to_run.split "+ str((time.time() - start1))
-    #start1= time.time()
-    junit_to_run = junit_tests[0]
-    #print "center info:: junit_tests[0] "+ str((time.time() - start1))
     if SHOW_DEBUG_INFO:
         print "\n===junit torun===\n" + junit_torun + "\n"
     print "center info:: junit to run stuff " + str((time.time() - start))
@@ -306,94 +304,119 @@ def one_info_pass(
     #start = time.time()
     os.merge_dyn_files(dyng_go, go, "_getty_dyncg_-hash-_.ex", this_hash)
     os.merge_dyn_files(dyng_go, go, "_getty_dynfg_-hash-_.ex", this_hash)
-    #print "center info:: merge dyn files" + str((time.time() - start))
-    #start = time.time()
-    if json_filepath != "":
-        ######getting method -> tests info
-        fname =  go + "_getty_dyncg_" + this_hash + "_.ex"
-        methods_to_tests = create_methods_to_tests(fname, junit_torun)
-
-        #get types_to_methods
-        types_to_methods = read_in_types_to_methods(go, this_hash)
-
-        types_to_tests = {}
-        #f = open(go + "_types_to_tests_" + this_hash + "_.ex", "w+")
-        for key in types_to_methods.keys():
-            for method in types_to_methods.get(key):
-                method = method.strip("\n")
-                method = method + "("
-                for m in methods_to_tests.keys():
-                    method_name = m[:(len(method))]
-                    if method_name == method:
-                        for test in methods_to_tests[m]:
-                            if key in types_to_tests.keys():
-                                types_to_tests[key].add(test)
-                            else:
-                                types_to_tests[key] = set([test])
-        #For debugging
-        # for key in types_to_tests.keys():
-        #    for test in types_to_tests[key]:
-        #        f.write(key + "," + test + "\n")
-        # f.close()
-        with open(json_filepath) as f:
-            priorities = json.load(f)
-        tests_to_run = set()
-        types = set()
-        target_set = set()
-        for s in priorities["priorityList"]:
-            for type in types_to_tests.keys():
-                temp = type + ":"
-                if s[:len(temp)] == temp:
-                    for method in types_to_methods[type]:
-                        for m in methods_to_tests:
-                            temp = method.strip("\n") + "("
-                            if m[:len(temp)] == temp:
-                                methodNumber = m.split("-")
-                                target_set.add((method.strip("\n")) + "-" + methodNumber[1])
-                    for test in types_to_tests[type]:
-                        tests_to_run.add(test)
-                        types.add(type)
-                        # print "s: " + s + "type: " + type + " test " + test
-        ###########
-        tests_for_junit = set()
-        for test in tests_to_run:
-            i = test.rfind(":")
-            temp = test[:i]
-            tests_for_junit.add(temp)
-        for temp in tests_for_junit:
-            junit_to_run = junit_to_run + " " + temp
-        junit_torun = junit_to_run
-    #print "center info:: megans code "  + str((time.time() - start))
-
-    start = time.time()
     caller_of, callee_of = agency.caller_callee(go, this_hash)
     pred_of, succ_of = agency.pred_succ(go, this_hash)
-    #print "center info:: agency.caller_callee & pred_succ "  + str((time.time() - start))
+    if json_filepath != "":
+        junit_torun, target_set, test_set = get_tests_and_target_set(go, json_filepath, junit_torun, this_hash)
+    else:
+        test_set = agency.get_test_set_dyn(callee_of, junit_torun)
 
-    # add test methods into target set
-    #start = time.time()
-    test_set = agency.get_test_set_dyn(target_set, callee_of, junit_torun)
-    #print "center info:: agency get test set dyn: " + str((time.time() - start))
     #test_set is correct
     # reset target set here
-    #start = time.time()
     refined_target_set, changed_methods, changed_tests = \
         agency.refine_targets(full_method_info_map, target_set, test_set,
                               caller_of, callee_of, pred_of, succ_of,
                               changed_methods, changed_tests,
                               inner_dataflow_methods, outer_dataflow_methods, json_filepath)
-    #print "center info:: agency refine targets: " + str((time.time() - start))
-    #start = time.time()
+
     profiler.log_csv(["method_count", "test_count", "refined_target_count"],
                      [[len(target_set), len(test_set), len(refined_target_set)]],
                      go + "_getty_y_method_count_" + this_hash + "_.profile.readable")
-    print "center info:: profiler.log_csv " + str((time.time() - start))
-    start = time.time()
+
     git.clear_temp_checkout(this_hash)
-    #print "center info:: clear temp checkout: " + str((time.time() - start))
-    
+
     return common_package, test_set, refined_target_set, changed_methods, changed_tests, \
         cp, junit_torun, full_method_info_map
+
+
+def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
+    #have to add junit runner to junit_to_run in order to get invariants
+    junits_to_run = junit_torun.split(" ")
+    junit_to_run = junits_to_run[0]
+    ######getting method -> tests
+    fname = go + "_getty_dyncg_" + this_hash + "_.ex"
+    methods_to_tests, nontest_method_calls = create_methods_to_tests(fname, junit_torun)
+    # get types_to_methods
+    types_to_methods = read_in_types_to_methods(go, this_hash)
+    #get priority list from json file
+    with open(json_filepath) as f:
+        priorities = json.load(f)
+    test_set = set()
+    target_set = set()
+    methods_to_check = set()
+    for priority in priorities["priorityList"]:
+        s = priority + "("
+        method = ""
+        #check to see if method is eventually called by a test
+        for m in methods_to_tests:
+            if m[:len(s)] == s:
+                method = m
+                break
+        #if eventually called by a test then add to target set
+        #add tests that call it to test set
+        if method:
+            methodNumber = method[(method.rfind("-")):]
+            target_set.add(priority + methodNumber)
+            for test in methods_to_tests[method]:
+                test_set.add(test)
+            #methods to check are for checking if there are called methods within target
+            methods_to_check.add(method)
+        #else it must be a method that belongs to a type. Get methods that implement it
+        #or are in a subclass of it
+        else:
+            index = priority.find(":")
+            type = priority[:index]
+            method_name = priority[index:]
+            method_name = method_name.strip()
+            #check to see if type is a valid type
+            if type in types_to_methods:
+                #for each method in the type get corresponding subtype method
+                for m in types_to_methods[type]:
+                    m = m.strip()
+                    i = m.rfind(":")
+                    if m[i:] == method_name:
+                        for key in methods_to_tests:
+                            #add corresponding subtype method to target set and
+                            #tests that call it to test set
+                            if key[:len(m)] == m:
+                                methodNumber = key[(key.rfind("-")):]
+                                target_set.add(m + methodNumber)
+                                for test in methods_to_tests[key]:
+                                    test_set.add(test)
+                                methods_to_check.add(key)
+        seen_methods = set([])
+        #(methods_to_check = target set 1st iteration)
+        #for each method in target set check if it calls another method
+        #if so add that method to methods to check and target set
+        #run until no more methods to check or all methods have been seen
+        while methods_to_check:
+            to_check = set(methods_to_check)
+            for m in to_check:
+                if not m in seen_methods:
+                    seen_methods.add(m)
+                    if m in nontest_method_calls.keys():
+                        for callee in nontest_method_calls[m]:
+                            methods_to_check.add(callee)
+                            if callee in methods_to_tests:
+                                index = callee.find(":")
+                                type = callee[:index]
+                                for method in types_to_methods[type]:
+                                    method_name = method[:(method.find("("))]
+                                    line_number = method[(method.rfind("-")):]
+                                    target_set.add(method_name + line_number)
+                                for test in methods_to_tests[callee]:
+                                    test_set.add(test)
+                methods_to_check.remove(m)
+    #add each corresponding junit suite to junit to run
+    tests_for_junit = set()
+    for test in test_set:
+        i = test.rfind(":")
+        temp = test[:i]
+        tests_for_junit.add(temp)
+    for temp in tests_for_junit:
+        junit_to_run = junit_to_run + " " + temp
+    junit_torun = junit_to_run
+    return junit_torun, target_set, test_set
 
 
 def read_in_types_to_methods(go, this_hash):
@@ -415,26 +438,32 @@ def create_methods_to_tests(fname, junit_torun):
         content = f.readlines()
     total_pairs = []
     nonTestMethodCalls = {}
+    #read in line to get method calls
     for line in content:
-        line.strip("[()]")
+        line = line.strip("[()]")
         pairs = line.split("), (")
         total_pairs = total_pairs + pairs
     for pair in total_pairs:
         invocation = pair.split("\", ")
+        #invocation[0] is caller invocation[1] is callee and invocation[2] is number of times called
+        #invocation [2] is not needed for this analysis, can throw away.
         for i in range(0, 2):
             invocation[i] = (invocation[i]).replace("\"", "")
         isATest = False
+        #junit_torun is one string, split by space to get each test suite name
         testSuites = junit_torun.split(" ")
-        for prefix in testSuites:
-            prefix = prefix + ":"
-            package = invocation[0][:(len(prefix))]
-            if prefix == package:
-                isATest = True
+        #get package name from invocation, package name is package[0]
+        package = invocation[0].split(":")
+        #check if package name is a test suite. if so then it is a test.
+        if package[0] in testSuites:
+            isATest = True
+        #if it is a test store in methods to tests
         if isATest:
             if invocation[1] in methods_to_tests.keys():
                 methods_to_tests[invocation[1]].add(invocation[0])
             else:
                 methods_to_tests[invocation[1]] = set([invocation[0]])
+        #if not a test then it is a method calling another method
         else:
             if invocation[0] in nonTestMethodCalls.keys():
                 for k in nonTestMethodCalls[invocation[0]]:
@@ -442,41 +471,41 @@ def create_methods_to_tests(fname, junit_torun):
                         nonTestMethodCalls[invocation[0]].union(nonTestMethodCalls[k])
             else:
                 nonTestMethodCalls[invocation[0]] = set([invocation[1]])
+        #for each caller that calls another method call, add tests for caller to callee
         for caller in nonTestMethodCalls:
             for callee in nonTestMethodCalls[caller]:
                 if callee in methods_to_tests and caller in methods_to_tests:
                     methods_to_tests[callee].union(methods_to_tests[caller])
                 elif caller in methods_to_tests:
                     methods_to_tests[callee] = methods_to_tests[caller]
-    return methods_to_tests
+    return methods_to_tests, nonTestMethodCalls
 
 
 # one pass template
-def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, analysis_only=False):
-    
+def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, test_selection, analysis_only=False):
+
     if not analysis_only:
         os.sys_call("git checkout " + this_hash)
-    #start = time.time()
+
     os.sys_call("mvn clean")
-    #print "center mvn clean: " + str((time.time() - start))
-    
+
     if SHOW_DEBUG_INFO:
         print "\n===full classpath===\n" + cp + "\n"
-    
-    java_cmd = " ".join(["java", "-cp", cp, 
-#                          "-Xms"+config.min_heap, 
-                         "-Xmx"+config.max_heap, 
-                         "-XX:+UseConcMarkSweepGC", 
-#                          "-XX:-UseGCOverheadLimit",
+
+    java_cmd = " ".join(["java", "-cp", cp,
+                         #                          "-Xms"+config.min_heap,
+                         "-Xmx"+config.max_heap,
+                         "-XX:+UseConcMarkSweepGC",
+                         #                          "-XX:-UseGCOverheadLimit",
                          "-XX:-UseSplitVerifier",  # FIXME: JDK 8- only! 
                          ])
-    
+
     # os.sys_call("mvn test -DskipTests", ignore_bad_exit=True)
     os.sys_call("mvn test-compile")
-    
+
     if SHOW_DEBUG_INFO:
         print "\n===junit torun===\n" + junit_torun + "\n"
-    
+
     # v3.2, v4 execute with 4 core
     num_primary_workers = config.num_master_workers
     auto_parallel_targets = config.auto_fork
@@ -485,26 +514,23 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, analysis_on
     target_map = daikon.target_s2m(refined_target_set)
     #print "daikon tart_s2m: " + str((time.time() - start))
     all_classes = target_map.keys()
-    
+
     consider_expansion = (not analysis_only)
-    
+
     if len(refined_target_set) <= num_primary_workers or (num_primary_workers == 1 and not auto_parallel_targets):
         single_set_tuple = (refined_target_set, "0")
-        #start = time.time()
-        seq_get_invs(single_set_tuple, java_cmd, junit_torun, go, this_hash, consider_expansion)
-        #print "center seq get invs: " + str((time.time() - start))
+        seq_get_invs(single_set_tuple, java_cmd, junit_torun, go, this_hash, consider_expansion, test_selection)
     elif num_primary_workers > 1:  # FIXME: this distributation is buggy
         target_set_inputs = []
         all_target_set_list = list(refined_target_set)
         each_bulk_size = int(len(refined_target_set) / num_primary_workers)
-        start = time.time()
-        seq_func = partial(seq_get_invs, 
+
+        seq_func = partial(seq_get_invs,
                            java_cmd=java_cmd, junit_torun=junit_torun, go=go, this_hash=this_hash,
-                           consider_expansion=consider_expansion)
-        #print "center partial: " + str((time.time() - start))
+                           consider_expansion=consider_expansion, test_selection=test_selection)
         for i in range(num_primary_workers):
             if not(i == num_primary_workers - 1):
-                sub_list_tuple = (all_target_set_list[each_bulk_size*i:each_bulk_size*(i+1)], str(i))                
+                sub_list_tuple = (all_target_set_list[each_bulk_size*i:each_bulk_size*(i+1)], str(i))
                 target_set_inputs.append(sub_list_tuple)
             else:
                 sub_list_tuple = (all_target_set_list[each_bulk_size*i:], str(i))
@@ -519,17 +545,16 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, analysis_on
         # elastic automatic processing
         target_set_inputs = []
         num_processes = 0
-        
+
         # target_map has been calculated already
         # target_map = daikon.target_s2m(refined_target_set)
         # all_classes = target_map.keys()
         #start = time.time()
         num_keys = len(all_classes)
-        seq_func = partial(seq_get_invs, 
+        seq_func = partial(seq_get_invs,
                            java_cmd=java_cmd, junit_torun=junit_torun, go=go, this_hash=this_hash,
-                           consider_expansion=consider_expansion)
-        #print "center partial: " + str((time.time() - start))
-        
+                           consider_expansion=consider_expansion, test_selection= test_selection)
+
         for i in range(0, num_keys, slave_load):
             # (inclusive) lower bound is i
             # (exclusive) upper bound:
@@ -542,53 +567,52 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, analysis_on
             sublist_tuple = (sublist, str(num_processes))
             target_set_inputs.append(sublist_tuple)
             num_processes += 1
-        
+
         max_parallel_processes = config.num_slave_workers
         if not analysis_only:
             profiler.log_csv(["class_count", "process_count", "max_parallel_processes", "slave_load"],
                              [[num_keys, num_processes, max_parallel_processes, slave_load]],
                              go + "_getty_y_elastic_count_" + this_hash + "_.profile.readable")
-        
+
         input_pool = Pool(max_parallel_processes)
         input_pool.map(seq_func, target_set_inputs)
         input_pool.close()
         input_pool.join()
-        
+
     else:
         print "\nIncorrect option for one center pass:"
         print "\tnum_primary_workers:", str(num_primary_workers)
         print "\tauto_parallel_targets:", str(auto_parallel_targets)
         print "\tslave_load", str(slave_load)
         sys.exit(1)
-    
+
     if config.compress_inv:
         os.remove_many_files(go, "*.inv.gz")
     else:
         os.remove_many_files(go, "*.inv")
-    
+
     # include coverage report for compare
     if config.analyze_test_coverage and not analysis_only:
         try:
             mvn.generate_coverage_report(go, this_hash)
         except:
             pass
-    
+
     if not analysis_only:
         git.clear_temp_checkout(this_hash)
-    
-    
+
+
     if config.class_level_expansion:
         extra_expansion = get_expansion_set(go)
         os.remove_many_files(go, config.expansion_tmp_files + "*")
     else:
         extra_expansion = None
-    
+
     return all_classes, extra_expansion
 
 
 def mixed_passes(go, prev_hash, post_hash, refined_expansion_set,
-                 refined_target_set, old_refined_target_set, new_refined_target_set,
-                 old_cp, new_cp, old_junit_torun, new_junit_torun):
+                 refined_target_set, new_cp, old_junit_torun, new_junit_torun, test_selection):
     if config.class_level_expansion:
         impact_set = refined_target_set | refined_expansion_set
     else:
@@ -601,7 +625,7 @@ def mixed_passes(go, prev_hash, post_hash, refined_expansion_set,
 #     os.sys_call("mvn clean test-compile")
     one_inv_pass(go, new_cp, new_junit_torun,
                  prev_hash + "_" + post_hash,
-                 impact_set, analysis_only=True)
+                 impact_set, test_selection, analysis_only=True)
     git.clear_temp_checkout(prev_hash)
     
     # checkout old commit, then checkout new src
@@ -612,7 +636,7 @@ def mixed_passes(go, prev_hash, post_hash, refined_expansion_set,
 #     os.sys_call("mvn clean test-compile")
     one_inv_pass(go, new_cp, old_junit_torun,
                  post_hash + "_" + prev_hash,
-                 impact_set, analysis_only=True)
+                 impact_set, test_selection, analysis_only=True)
     git.clear_temp_checkout(prev_hash)
 
 
@@ -747,23 +771,25 @@ def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, pre
             old_changed_methods, new_changed_methods, old_method_info_map, new_method_info_map), \
         _merge_target_sets(
             old_changed_tests, new_changed_tests, old_method_info_map, new_method_info_map)
-    #print "center 3 merge target sets: " + str((time.time() - start))
+
+    if json_filepath != "":
+        test_selection = True
+    else:
+        test_selection = False
     '''
         3-rd pass: checkout prev_commit as detached head, and get invariants for all interesting targets
     '''
     #start = time.time()
     old_all_classes, old_expansion = one_inv_pass(go,
-        old_cp, old_junit_torun, prev_hash, refined_target_set)
-    #print "center first one inv pass: " + str((time.time() - start))
+        old_cp, old_junit_torun, prev_hash, refined_target_set, test_selection)
+    
     '''
         4-th pass: checkout post_commit as detached head, and get invariants for all interesting targets
     '''
     #start = time.time()
     new_all_classes, new_expansion = one_inv_pass(go,
-        new_cp, new_junit_torun, post_hash, refined_target_set)
-    #print "center second one inv pass: " + str((time.time() - start))
-
-    #start = time.time()
+        new_cp, new_junit_torun, post_hash, refined_target_set, test_selection)
+    
     common_expansion = set()
     refined_expansion_set = set()
     if config.class_level_expansion:
@@ -776,8 +802,7 @@ def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, pre
     '''
     if iso:
         mixed_passes(go, prev_hash, post_hash, refined_expansion_set,
-                     refined_target_set, old_refined_target_set, new_refined_target_set,
-                     old_cp, new_cp, old_junit_torun, new_junit_torun)
+                     refined_target_set, new_cp, old_junit_torun, new_junit_torun, test_selection)
     
     '''
         last pass: set common interests
@@ -795,7 +820,7 @@ def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, pre
     all_classes_set = set(old_all_classes + new_all_classes)
     all_classes_set = _append_class_ln(all_classes_set)
     #print "center append class ln: " + str((time.time() - start))
-    
+
     print 'Center analysis is completed.'
     return common_package, all_classes_set, refined_target_set, \
         old_test_set, old_refined_target_set, new_test_set, new_refined_target_set, \
