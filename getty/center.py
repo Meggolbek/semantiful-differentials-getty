@@ -132,9 +132,9 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
                   junit_torun])
     if SHOW_DEBUG_INFO:
         print "\n=== Daikon:Chicory+Daikon(online) command to run: \n" + run_chicory_daikon
-    #start = time.time()
+    start = time.time()
     os.sys_call(run_chicory_daikon, ignore_bad_exit=True)
-    #print "center run_chickory_daikon"+ str((time.time() - start))
+    print "center run_chickory_daikon"+ str((time.time() - start))
 
     expansion = set()
     if consider_expansion and config.class_level_expansion:
@@ -248,7 +248,7 @@ def one_info_pass(
     os.sys_call("mvn test-compile")
     print "center info:: compile tests: " + str((time.time() - start))
     start = time.time()
-    start1 = time.time()
+
     junit_torun = mvn.junit_torun_str(cust_mvn_repo)
     if SHOW_DEBUG_INFO:
         print "\n===junit torun===\n" + junit_torun + "\n"
@@ -516,7 +516,7 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, test_select
     all_classes = target_map.keys()
 
     consider_expansion = (not analysis_only)
-
+    start = time.time()
     if len(refined_target_set) <= num_primary_workers or (num_primary_workers == 1 and not auto_parallel_targets):
         single_set_tuple = (refined_target_set, "0")
         seq_get_invs(single_set_tuple, java_cmd, junit_torun, go, this_hash, consider_expansion, test_selection)
@@ -585,7 +585,7 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, test_select
         print "\tauto_parallel_targets:", str(auto_parallel_targets)
         print "\tslave_load", str(slave_load)
         sys.exit(1)
-
+    print "seq get invs " + str((time.time() - start))
     if config.compress_inv:
         os.remove_many_files(go, "*.inv.gz")
     else:
@@ -779,17 +779,19 @@ def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, pre
     '''
         3-rd pass: checkout prev_commit as detached head, and get invariants for all interesting targets
     '''
-    #start = time.time()
+    start = time.time()
     old_all_classes, old_expansion = one_inv_pass(go,
         old_cp, old_junit_torun, prev_hash, refined_target_set, test_selection)
-    
+    print "center one_inv pass: " + str((time.time() - start))
+
     '''
         4-th pass: checkout post_commit as detached head, and get invariants for all interesting targets
     '''
-    #start = time.time()
+    start = time.time()
     new_all_classes, new_expansion = one_inv_pass(go,
         new_cp, new_junit_torun, post_hash, refined_target_set, test_selection)
-    
+    print "center second one_inv pass: " + str((time.time() - start))
+
     common_expansion = set()
     refined_expansion_set = set()
     if config.class_level_expansion:
