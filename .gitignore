@@ -2,3 +2,4 @@ java/bin/*
 bin/*
 
 .DS_Store
+*.pyc
