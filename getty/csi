@@ -53,7 +53,7 @@ def config_env():
 
     start = time.time()
     this_script_dir = this_script_path[:this_script_path.rfind("/")+1]
-    print "CSII CONFIG ENV: get csi script dir "
+    print "CSII CONFIG ENV: get csi script dir " + str(time.time() - start)
     start = time.time()
     villa_path = this_script_dir + "lib/villa-2.0.jar"  # jar is at the same dir
     print "CSII CONFIG ENV: get villa jar path " + str(time.time() - start)
@@ -449,7 +449,8 @@ if __name__ == "__main__":
                  old_test_set, new_test_set, \
                  prev_hash, post_hash, old_l2m, new_l2m, old_m2l, new_m2l)",
             go + "_getty_x_profile_gallery.profile")
-    elif json_filepath == "":
+    #elif json_filepath == "":
+    else:
         gallery.exam(
             iso, pwd, go, fe_path, common_package, all_classes_set,
             targets, all_refined_target_set,
