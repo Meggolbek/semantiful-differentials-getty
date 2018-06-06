@@ -94,7 +94,9 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
     target_set = target_set_index_pair[0]
     
 #     select_pattern = daikon.select_full(target_set)
+    start = time.time()
     select_pattern = daikon.dfformat_full_ordered(target_set)
+    print "center seq_get_invs: get select pattern" + str((time.time() - start))
     print "\n=== select pattern ===\n" + select_pattern + "\n"
     
     inv_gz = go + "_getty_inv_" + this_hash + "_." + index
@@ -129,12 +131,14 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
         print "\n=== Daikon:Chicory+Daikon(online) command to run: \n" + run_chicory_daikon
     start = time.time()
     os.sys_call(run_chicory_daikon, ignore_bad_exit=True)
-    print "center run_chickory_daikon"+ str((time.time() - start))
+    print "center seq_get_invs: run_chickory_daikon" + str((time.time() - start))
     
     expansion = set()
     if consider_expansion and config.class_level_expansion:
         try:
+            start = time.time()
             all_methods_expansion(expansion, target_set, go, this_hash, index, java_cmd, inv_gz)
+            print "center seq_get_invs: all methods expansion" + str((time.time() - start))
         except:
             pass
     
@@ -147,7 +151,9 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
         all_to_consider = (all_to_consider | expansion)
     
     for tgt in all_to_consider:
+        start = time.time()
         target_ff = daikon.fsformat_with_sigs(tgt)
+        print "center seq_get_invs: fsformat with sigs" + str((time.time() - start))
         out_file = go+"_getty_inv__"+target_ff+"__"+this_hash+"_.inv.out"
         run_printinv = \
             " ".join([java_cmd, "daikon.PrintInvariants",
@@ -164,11 +170,14 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
                               bar_length=50)
         elif SHOW_MORE_DEBUG_INFO:
             print "\n=== Daikon:PrintInvs command to run: \n" + run_printinv
-        #start = time.time()
+        start = time.time()
         os.sys_call(run_printinv, ignore_bad_exit=True)
-        #print "center run_printinv" + str((time.time() - start))
+        print "center run_printinv" + str((time.time() - start))
+        start = time.time()
         sort_txt_inv(out_file)
+        print "center seq_get_inv: sort txt inv" + str((time.time() - start))
     os.remove_file(inv_gz)
+    print "total time for seq get invariants: " + str(time.time() - start_of_func)
 
 
 def get_expansion_set(go):
