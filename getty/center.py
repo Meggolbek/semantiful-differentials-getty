@@ -93,21 +93,25 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
     index = target_set_index_pair[1]
     target_set = target_set_index_pair[0]
     #if test selection remove class from target set
+    start = time.time()
     if test_selection:
         ttarget_set = set(target_set)
         for s in ttarget_set:
             if not s.__contains__(":"):
                 target_set.remove(s)
-#     select_pattern = daikon.select_full(target_set)
+    print "center seq_get_invs: remove class from target set"+ str((time.time() - start))
+    #     select_pattern = daikon.select_full(target_set)
+    start = time.time()
     select_pattern = daikon.dfformat_full_ordered(target_set, test_selection)
+    print "center seq_get_invs: get select pattern"+ str((time.time() - start))
     print "\n=== select pattern ===\n" + select_pattern + "\n"
-    
+
     inv_gz = go + "_getty_inv_" + this_hash + "_." + index
     if config.compress_inv:
         inv_gz += ".inv.gz"
     else:
         inv_gz += ".inv"
-    
+
     daikon_control_opt_list = []
     if SHOW_MORE_DEBUG_INFO:
         daikon_control_opt_list.append("--show_progress --no_text_output")
@@ -134,25 +138,29 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
         print "\n=== Daikon:Chicory+Daikon(online) command to run: \n" + run_chicory_daikon
     start = time.time()
     os.sys_call(run_chicory_daikon, ignore_bad_exit=True)
-    print "center run_chickory_daikon"+ str((time.time() - start))
+    print "center seq_get_invs: run_chickory_daikon"+ str((time.time() - start))
 
     expansion = set()
     if consider_expansion and config.class_level_expansion:
         try:
+            start = time.time()
             all_methods_expansion(expansion, go, this_hash, index, java_cmd, inv_gz)
+            print "center seq_get_invs: all methods expansion"+ str((time.time() - start))
         except:
             pass
-    
+
     if SHOW_DEBUG_INFO:
         current_count = 0
         total_count = len(target_set)
-    
+
     all_to_consider = set(target_set)
     if config.class_level_expansion:
         all_to_consider = (all_to_consider | expansion)
-    
+
     for tgt in all_to_consider:
+        start = time.time()
         target_ff = daikon.fsformat_with_sigs(tgt)
+        print "center seq_get_invs: fsformat with sigs"+ str((time.time() - start))
         out_file = go+"_getty_inv__"+target_ff+"__"+this_hash+"_.inv.out"
         run_printinv = \
             " ".join([java_cmd, "daikon.PrintInvariants",
@@ -163,18 +171,21 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
             current_count += 1
             if config.show_regex_debug:
                 print "\n\tthe regex for: " + tgt + "\n\t\t" + daikon.dpformat_with_sigs(tgt) + "\n"
-            os.print_progress(current_count, total_count, 
-                              prefix='Progress('+index+'):', 
-                              suffix='('+str(current_count)+'/'+str(total_count)+': '+tgt+')'+' '*20, 
+            os.print_progress(current_count, total_count,
+                              prefix='Progress('+index+'):',
+                              suffix='('+str(current_count)+'/'+str(total_count)+': '+tgt+')'+' '*20,
                               bar_length=50)
         elif SHOW_MORE_DEBUG_INFO:
             print "\n=== Daikon:PrintInvs command to run: \n" + run_printinv
-        #start = time.time()
+        start = time.time()
         os.sys_call(run_printinv, ignore_bad_exit=True)
-        #print "center run_printinv" + str((time.time() - start))
+        print "center seq get inv: run_printinv" + str((time.time() - start))
+        start = time.time()
         sort_txt_inv(out_file)
+        print "center seq_get_inv: sort txt inv" + str((time.time() - start))
     os.remove_file(inv_gz)
     print "total time for seq get invariants: " + str(time.time() - start_of_func)
+
 
 
 def get_expansion_set(go):
@@ -351,29 +362,41 @@ def one_info_pass(
 
 def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
     #have to add junit runner to junit_to_run in order to get invariants
+    start = time.time()
     junits_to_run = junit_torun.split(" ")
     junit_to_run = junits_to_run[0]
+    print "center get_tests_and_target_set:: get new junit_to_run" + str((time.time() - start))
     ######getting method -> tests
     fname = go + "_getty_dyncg_" + this_hash + "_.ex"
+    start = time.time()
     methods_to_tests, nontest_method_calls = create_methods_to_tests(fname, junit_torun)
+    print "center get_tests_and_target_set:: create_methods_to_tests" + str((time.time() - start))
     # get types_to_methods
+    start = time.time()
     types_to_methods = read_in_types_to_methods(go, this_hash)
+    print "center get_tests_and_target_set:: read in types to methods" + str((time.time() - start))
     #get priority list from json file
+    start = time.time()
     with open(json_filepath) as f:
         priorities = json.load(f)
+    print "center get_tests_and_target_set: retrieve priorities" + str((time.time() - start))
     test_set = set()
     target_set = set()
     methods_to_check = set()
+    start1 = time.time()
     for priority in priorities["priorityList"]:
         s = priority + "("
         method = ""
         #check to see if method is eventually called by a test
+        start = time.time()
         for m in methods_to_tests:
             if m[:len(s)] == s:
                 method = m
                 break
+        print "center get_tests_and_target_set: check if method is called by test" + str((time.time() - start))
         #if eventually called by a test then add to target set
         #add tests that call it to test set
+        start = time.time()
         if method:
             methodNumber = method[(method.rfind("-")):]
             target_set.add(priority + methodNumber)
@@ -405,6 +428,8 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
                                     test_set.add(test)
                                 methods_to_check.add(key)
         seen_methods = set([])
+        print "center get_tests_and_target_set: get test set and target set" + str((time.time() - start))
+        start = time.time()
         #(methods_to_check = target set 1st iteration)
         #for each method in target set check if it calls another method
         #if so add that method to methods to check and target set
@@ -427,6 +452,8 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
                                 for test in methods_to_tests[callee]:
                                     test_set.add(test)
                 methods_to_check.remove(m)
+        print "center get_tests_and_target_set: add to target set if called by method in target set" + str((time.time() - start))
+    start = time.time()
     #add each corresponding junit suite to junit to run
     tests_for_junit = set()
     for test in test_set:
@@ -436,6 +463,8 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
     for temp in tests_for_junit:
         junit_to_run = junit_to_run + " " + temp
     junit_torun = junit_to_run
+    print "center get_tests_and_target_set: get new junit" + str((time.time() - start))
+
     return junit_torun, target_set, test_set
 
 

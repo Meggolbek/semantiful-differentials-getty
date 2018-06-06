@@ -2,18 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="34efbc08-b5de-470b-9cd4-68e717261e52" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/semantiful-differentials-getty.iml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/getty/agency.py" afterPath="$PROJECT_DIR$/getty/agency.py" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/getty/center.py" afterPath="$PROJECT_DIR$/getty/center.py" />
-      <change beforePath="$PROJECT_DIR$/getty/csi" afterPath="$PROJECT_DIR$/getty/csi" />
-      <change beforePath="$PROJECT_DIR$/getty/tools/daikon.py" afterPath="$PROJECT_DIR$/getty/tools/daikon.py" />
-      <change beforePath="$PROJECT_DIR$/getty/tools/git.py" afterPath="$PROJECT_DIR$/getty/tools/git.py" />
-      <change beforePath="$PROJECT_DIR$/getty/tools/mvn.py" afterPath="$PROJECT_DIR$/getty/tools/mvn.py" />
-      <change beforePath="$PROJECT_DIR$/getty/villa.py" afterPath="$PROJECT_DIR$/getty/villa.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -27,7 +17,7 @@
       <file leaf-file-name="csi" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/getty/csi">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1535">
+            <state relative-caret-position="11000">
               <caret line="300" column="0" lean-forward="false" selection-start-line="300" selection-start-column="0" selection-end-line="300" selection-end-column="0" />
               <folding />
             </state>
@@ -37,7 +27,7 @@
       <file leaf-file-name="os.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/getty/tools/os.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="698">
+            <state relative-caret-position="2840">
               <caret line="72" column="25" lean-forward="false" selection-start-line="72" selection-start-column="25" selection-end-line="72" selection-end-column="25" />
               <folding />
             </state>
@@ -47,8 +37,8 @@
       <file leaf-file-name="center.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/getty/center.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="738">
-              <caret line="777" column="59" lean-forward="false" selection-start-line="777" selection-start-column="59" selection-end-line="777" selection-end-column="59" />
+            <state relative-caret-position="40">
+              <caret line="124" column="35" lean-forward="true" selection-start-line="124" selection-start-column="35" selection-end-line="124" selection-end-column="35" />
               <folding />
             </state>
           </provider>
@@ -57,7 +47,7 @@
       <file leaf-file-name="config.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/getty/config.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="538">
+            <state relative-caret-position="600">
               <caret line="15" column="2" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="2" />
               <folding />
             </state>
@@ -67,8 +57,8 @@
       <file leaf-file-name="agency.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/getty/agency.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="618">
-              <caret line="53" column="45" lean-forward="false" selection-start-line="53" selection-start-column="45" selection-end-line="53" selection-end-column="45" />
+            <state relative-caret-position="40">
+              <caret line="71" column="20" lean-forward="true" selection-start-line="71" selection-start-column="20" selection-end-line="71" selection-end-column="20" />
               <folding>
                 <element signature="e#34#43#0" expanded="true" />
               </folding>
@@ -79,7 +69,7 @@
       <file leaf-file-name="villa.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/getty/villa.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1535">
+            <state relative-caret-position="1800">
               <caret line="45" column="23" lean-forward="false" selection-start-line="45" selection-start-column="23" selection-end-line="45" selection-end-column="23" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
@@ -91,7 +81,7 @@
       <file leaf-file-name="mvn.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/getty/tools/mvn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1535">
+            <state relative-caret-position="4600">
               <caret line="119" column="8" lean-forward="false" selection-start-line="119" selection-start-column="8" selection-end-line="119" selection-end-column="8" />
               <folding />
             </state>
@@ -101,7 +91,7 @@
       <file leaf-file-name="daikon.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/getty/tools/daikon.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="470">
+            <state relative-caret-position="7080">
               <caret line="177" column="23" lean-forward="false" selection-start-line="177" selection-start-column="23" selection-end-line="177" selection-end-column="23" />
               <folding>
                 <element signature="e#66#75#0" expanded="true" />
@@ -113,7 +103,7 @@
       <file leaf-file-name="git.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/getty/tools/git.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="538">
+            <state relative-caret-position="4920">
               <caret line="123" column="9" lean-forward="false" selection-start-line="123" selection-start-column="4" selection-end-line="123" selection-end-column="9" />
               <folding>
                 <element signature="e#13#22#0" expanded="true" />
@@ -126,10 +116,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>main</find>
-      <find>config_env</find>
-      <find>mak</find>
-      <find>get_remote_he</find>
       <find>get_remote</find>
       <find>chdi</find>
       <find>get_has</find>
@@ -156,6 +142,10 @@
       <find>common</find>
       <find>real_names</find>
       <find>merge</find>
+      <find>common_pr</find>
+      <find>refine_targets</find>
+      <find>ref</find>
+      <find>seq_get_invs</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -173,17 +163,18 @@
         <option value="$PROJECT_DIR$/getty/csi" />
         <option value="$PROJECT_DIR$/getty/villa.py" />
         <option value="$PROJECT_DIR$/getty/tools/git.py" />
-        <option value="$PROJECT_DIR$/getty/center.py" />
         <option value="$PROJECT_DIR$/getty/tools/mvn.py" />
         <option value="$PROJECT_DIR$/getty/tools/daikon.py" />
+        <option value="$PROJECT_DIR$/getty/center.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="735" />
-    <option name="width" value="3119" />
+    <option name="x" value="1370" />
+    <option name="width" value="2484" />
     <option name="height" value="2074" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
@@ -256,7 +247,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="735" y="0" width="3119" height="2074" extended-state="0" />
+    <frame x="1370" y="0" width="2484" height="2074" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24975705" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -265,17 +257,27 @@
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24975705" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -328,9 +330,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="13280">
           <caret line="342" column="91" lean-forward="false" selection-start-line="342" selection-start-column="91" selection-end-line="342" selection-end-column="91" />
-          <folding>
-            <element signature="e#45#54#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -356,9 +356,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="13680">
           <caret line="342" column="91" lean-forward="false" selection-start-line="342" selection-start-column="91" selection-end-line="342" selection-end-column="91" />
-          <folding>
-            <element signature="e#45#54#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -446,9 +444,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="740">
           <caret line="594" column="58" lean-forward="true" selection-start-line="594" selection-start-column="58" selection-end-line="594" selection-end-column="58" />
-          <folding>
-            <element signature="e#45#54#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -482,9 +478,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3400">
           <caret line="85" column="61" lean-forward="false" selection-start-line="85" selection-start-column="57" selection-end-line="85" selection-end-column="61" />
-          <folding>
-            <element signature="e#45#54#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -510,9 +504,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="13280">
           <caret line="342" column="91" lean-forward="false" selection-start-line="342" selection-start-column="91" selection-end-line="342" selection-end-column="91" />
-          <folding>
-            <element signature="e#45#54#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -538,9 +530,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="13680">
           <caret line="342" column="91" lean-forward="false" selection-start-line="342" selection-start-column="91" selection-end-line="342" selection-end-column="91" />
-          <folding>
-            <element signature="e#45#54#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -601,9 +591,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="21440">
           <caret line="536" column="15" lean-forward="true" selection-start-line="536" selection-start-column="15" selection-end-line="536" selection-end-column="15" />
-          <folding>
-            <element signature="e#45#54#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -629,9 +617,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3400">
           <caret line="85" column="61" lean-forward="false" selection-start-line="85" selection-start-column="57" selection-end-line="85" selection-end-column="61" />
-          <folding>
-            <element signature="e#45#54#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -657,9 +643,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="13280">
           <caret line="342" column="91" lean-forward="false" selection-start-line="342" selection-start-column="91" selection-end-line="342" selection-end-column="91" />
-          <folding>
-            <element signature="e#45#54#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -685,9 +669,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="13680">
           <caret line="342" column="91" lean-forward="false" selection-start-line="342" selection-start-column="91" selection-end-line="342" selection-end-column="91" />
-          <folding>
-            <element signature="e#45#54#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -701,35 +683,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/getty/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="538">
-          <caret line="15" column="2" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/getty/csi">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1535">
+        <state relative-caret-position="11000">
           <caret line="300" column="0" lean-forward="false" selection-start-line="300" selection-start-column="0" selection-end-line="300" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/getty/agency.py">
+    <entry file="file://$PROJECT_DIR$/getty/tools/os.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="618">
-          <caret line="53" column="45" lean-forward="false" selection-start-line="53" selection-start-column="45" selection-end-line="53" selection-end-column="45" />
-          <folding>
-            <element signature="e#34#43#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="2840">
+          <caret line="72" column="25" lean-forward="false" selection-start-line="72" selection-start-column="25" selection-end-line="72" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/getty/config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="600">
+          <caret line="15" column="2" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="2" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/getty/villa.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1535">
+        <state relative-caret-position="1800">
           <caret line="45" column="23" lean-forward="false" selection-start-line="45" selection-start-column="23" selection-end-line="45" selection-end-column="23" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
@@ -737,19 +717,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/getty/tools/git.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="538">
-          <caret line="123" column="9" lean-forward="false" selection-start-line="123" selection-start-column="4" selection-end-line="123" selection-end-column="9" />
-          <folding>
-            <element signature="e#13#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/getty/tools/mvn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1535">
+        <state relative-caret-position="4600">
           <caret line="119" column="8" lean-forward="false" selection-start-line="119" selection-start-column="8" selection-end-line="119" selection-end-column="8" />
           <folding />
         </state>
@@ -757,7 +727,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/getty/tools/daikon.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="470">
+        <state relative-caret-position="7080">
           <caret line="177" column="23" lean-forward="false" selection-start-line="177" selection-start-column="23" selection-end-line="177" selection-end-column="23" />
           <folding>
             <element signature="e#66#75#0" expanded="true" />
@@ -765,18 +735,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/getty/tools/os.py">
+    <entry file="file://$PROJECT_DIR$/getty/tools/git.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="698">
-          <caret line="72" column="25" lean-forward="false" selection-start-line="72" selection-start-column="25" selection-end-line="72" selection-end-column="25" />
-          <folding />
+        <state relative-caret-position="4920">
+          <caret line="123" column="9" lean-forward="false" selection-start-line="123" selection-start-column="4" selection-end-line="123" selection-end-column="9" />
+          <folding>
+            <element signature="e#13#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/getty/agency.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="40">
+          <caret line="71" column="20" lean-forward="true" selection-start-line="71" selection-start-column="20" selection-end-line="71" selection-end-column="20" />
+          <folding>
+            <element signature="e#34#43#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/getty/center.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="738">
-          <caret line="777" column="59" lean-forward="false" selection-start-line="777" selection-start-column="59" selection-end-line="777" selection-end-column="59" />
+        <state relative-caret-position="40">
+          <caret line="124" column="35" lean-forward="true" selection-start-line="124" selection-start-column="35" selection-end-line="124" selection-end-column="35" />
           <folding />
         </state>
       </provider>
