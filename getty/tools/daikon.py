@@ -1,6 +1,7 @@
 # misc: utils for analysis, algorithms, prefix processings, etc.
 
 import re
+import time
 from copy import deepcopy
 
 import config
@@ -169,12 +170,17 @@ def real_names(targets):
 def __common_prefix(m):
     if not m:
         raise ValueError('list of strings should not be empty')
+    start = time.time()
     reformated = real_names(m)
+    print "daikon common prefix: real names() " + str(time.time() - start)
     min_s = min(reformated)
     max_s = max(reformated)
+    start = time.time()
     for i, c in enumerate(min_s):
         if c != max_s[i]:
+            print "daikon common prefix: get longest prefix " + str(time.time() - start)
             return min_s[:i]
+    print "daikon common prefix: get longest prefix " + str(time.time() - start)
     return min_s
 
 
