@@ -89,7 +89,7 @@ def all_methods_expansion(candidates, target_set, go, this_hash, index, java_cmd
 
 # v4. flexible to be run in parallel, in daikon-online mode
 def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, consider_expansion):
-    
+    start_of_func = time.time()
     index = target_set_index_pair[1]
     target_set = target_set_index_pair[0]
     
@@ -127,9 +127,9 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
                   junit_torun])
     if SHOW_DEBUG_INFO:
         print "\n=== Daikon:Chicory+Daikon(online) command to run: \n" + run_chicory_daikon
-    #start = time.time()
+    start = time.time()
     os.sys_call(run_chicory_daikon, ignore_bad_exit=True)
-    #print "center run_chickory_daikon"+ str((time.time() - start))
+    print "center run_chickory_daikon"+ str((time.time() - start))
     
     expansion = set()
     if consider_expansion and config.class_level_expansion:
@@ -200,7 +200,6 @@ def one_info_pass(
     os.sys_call("mvn clean")
     print "center info:: mvn clean: " + str((time.time() - start))
 
-    start = time.time()
     start1 = time.time()
     bin_path = mvn.path_from_mvn_call("outputDirectory")
     print "center info:: path from mvn call: " + str((time.time() - start1))
@@ -210,7 +209,6 @@ def one_info_pass(
     start1 = time.time()
     cp = mvn.full_classpath(junit_path, sys_classpath, bin_path, test_bin_path)
     print "center info:: full class path " + str((time.time() - start1))
-    print "center info:: mvn calls: " + str((time.time() - start))
     if SHOW_DEBUG_INFO:
         print "\n===full classpath===\n" + cp + "\n"
     start = time.time()
@@ -224,17 +222,17 @@ def one_info_pass(
     makedirs(getty_code_store)
     for adir in all_code_dirs:
         os.sys_call(" ".join(["cp -r", adir + "/*", getty_code_store]), ignore_bad_exit=True)
-    
+
     if config.use_special_junit_for_dyn:
         info_junit_path = os.rreplace(junit_path, config.default_junit_version, config.special_junit_version, 1)
         infocp = mvn.full_classpath(info_junit_path, sys_classpath, bin_path, test_bin_path)
     else:
         infocp = cp
-    java_cmd = " ".join(["java", "-cp", infocp, 
-#                         "-Xms"+config.min_heap, 
-                         "-Xmx"+config.max_heap, 
-                         "-XX:+UseConcMarkSweepGC", 
-#                          "-XX:-UseGCOverheadLimit",
+    java_cmd = " ".join(["java", "-cp", infocp,
+                         #                         "-Xms"+config.min_heap,
+                         "-Xmx"+config.max_heap,
+                         "-XX:+UseConcMarkSweepGC",
+                         #                          "-XX:-UseGCOverheadLimit",
                          "-XX:-UseSplitVerifier",  # FIXME: JDK 8- only! 
                          ])
     print "center info:: copy code to dir: " + str((time.time() - start))
@@ -242,55 +240,59 @@ def one_info_pass(
     start = time.time()
     os.sys_call("mvn test-compile")
     print "center info:: compile tests: " + str((time.time() - start))
+
     start = time.time()
-    start1 = time.time()
     junit_torun = mvn.junit_torun_str(cust_mvn_repo)
-    print "center info:: junit_to_run_str " + str((time.time() - start1))
-    #start1 = time.time()
+    print "center info:: junit_to_run_str " + str((time.time() - start))
+    start1 = time.time()
     junit_tests = junit_torun.split(" ")
-    #print "center info:: junit_to_run.split "+ str((time.time() - start1))
-    #start1= time.time()
+    print "center info:: junit_to_run.split "+ str((time.time() - start1))
+    start1= time.time()
     junit_to_run = junit_tests[0]
-    #print "center info:: junit_tests[0] "+ str((time.time() - start1))
+    print "center info:: junit_tests[0] "+ str((time.time() - start1))
     if SHOW_DEBUG_INFO:
         print "\n===junit torun===\n" + junit_torun + "\n"
-    print "center info:: junit to run stuff " + str((time.time() - start))
+    print "center info:: junit to run str " + str((time.time() - start))
     #### dynamic run one round for all information
-    #start = time.time()
+    start = time.time()
     prefixes = daikon.common_prefixes(target_set)
+    print "center info:: daikon common prefixes " + str((time.time() - start))
     common_package = ''
     if len(prefixes) == 1:
+        start = time.time()
         last_period_index = prefixes[0].rindex('.')
         if last_period_index > 0:
             # the common package should be at least one period away from the rest
             common_package = prefixes[0][:last_period_index]
+        print "center info:: if len prefixes ==1 set common package " + str((time.time() - start))
     prefix_regexes = []
+    start = time.time()
     for p in prefixes:
         prefix_regexes.append(p + "*")
     instrument_regex = "|".join(prefix_regexes)
-    #print "center info:: dynamic run one round for info" + str((time.time() - start))
+    print "center info:: get instrument regex " + str((time.time() - start))
     if SHOW_DEBUG_INFO:
         print "\n===instrumentation pattern===\n" + instrument_regex + "\n"
     # run tests with instrumentation
-    #start = time.time()
+    start = time.time()
     run_instrumented_tests = \
         " ".join([java_cmd, "-ea",
                   "-javaagent:" + agent_path + "=\"" + instrument_regex + "\"",
                   junit_torun])
     if SHOW_DEBUG_INFO:
         print "\n=== Instrumented testing command to run: \n" + run_instrumented_tests
-    
+
     if not path.exists(dyng_go):
         makedirs(dyng_go)
-    
+
     full_info_exfile = go + "_getty_binary_info_" + this_hash + "_.ex"
     os.sys_call(run_instrumented_tests +
-                    " > " + full_info_exfile +
-                    ("" if config.show_stack_trace_info else " 2> /dev/null"),
+                " > " + full_info_exfile +
+                ("" if config.show_stack_trace_info else " 2> /dev/null"),
                 ignore_bad_exit=True)
-    #print "center info:: run instrumented tests: " + str((time.time() - start))
+    print "center info::instrument tests and run: " + str((time.time() - start))
 
-    #start = time.time()
+    start = time.time()
 
     full_method_info_map = {}
     ext_start_index = len(config.method_info_line_prefix)
@@ -302,22 +304,30 @@ def one_info_pass(
                 rawdata = line[ext_start_index:]
                 k, v = rawdata.split(" : ")
                 full_method_info_map[k.strip()] = v.strip()
-    #print "center info:: read full info exfile: " + str((time.time() - start))
-    #start = time.time()
+    print "center info:: get full method info map: " + str((time.time() - start))
+    start = time.time()
     os.merge_dyn_files(dyng_go, go, "_getty_dyncg_-hash-_.ex", this_hash)
+    print "center info:: merge dyn files cg: " + str((time.time() - start))
+    start = time.time()
     os.merge_dyn_files(dyng_go, go, "_getty_dynfg_-hash-_.ex", this_hash)
     #print "center info:: merge dyn files" + str((time.time() - start))
-    #start = time.time()
+    print "center info:: merge dyn files fg: " + str((time.time() - start))
+    start_if = time.time()
     if json_filepath != "":
         ######getting method -> tests info
         fname =  go + "_getty_dyncg_" + this_hash + "_.ex"
+        start = time.time()
         methods_to_tests = create_methods_to_tests(fname, junit_torun)
+        print "center info:: create_methods_to_tests " + str((time.time() - start))
 
         #get types_to_methods
+        start = time.time()
         types_to_methods = read_in_types_to_methods(go, this_hash)
+        print "center info:: read in types to methods " + str((time.time() - start))
 
         types_to_tests = {}
         #f = open(go + "_types_to_tests_" + this_hash + "_.ex", "w+")
+        start = time.time()
         for key in types_to_methods.keys():
             for method in types_to_methods.get(key):
                 method = method.strip("\n")
@@ -330,11 +340,13 @@ def one_info_pass(
                                 types_to_tests[key].add(test)
                             else:
                                 types_to_tests[key] = set([test])
+        print "center info:: get types to tests " + str((time.time() - start))
         #For debugging
         # for key in types_to_tests.keys():
         #    for test in types_to_tests[key]:
         #        f.write(key + "," + test + "\n")
         # f.close()
+        start = time.time()
         with open(json_filepath) as f:
             priorities = json.load(f)
         tests_to_run = set()
@@ -354,7 +366,10 @@ def one_info_pass(
                         tests_to_run.add(test)
                         types.add(type)
                         # print "s: " + s + "type: " + type + " test " + test
+
+        print "center info:: get tests to run and target set " + str((time.time() - start))
         ###########
+        start = time.time()
         tests_for_junit = set()
         for test in tests_to_run:
             i = test.rfind(":")
@@ -363,37 +378,40 @@ def one_info_pass(
         for temp in tests_for_junit:
             junit_to_run = junit_to_run + " " + temp
         junit_torun = junit_to_run
-    #print "center info:: megans code "  + str((time.time() - start))
+        print "center info:: get new junit_torun " + str((time.time() - start))
+    print "center info:: if json "  + str((time.time() - start_if))
 
     start = time.time()
     caller_of, callee_of = agency.caller_callee(go, this_hash)
+    print "center info:: agency.caller_callee "  + str((time.time() - start))
+    start = time.time()
     pred_of, succ_of = agency.pred_succ(go, this_hash)
-    #print "center info:: agency.caller_callee & pred_succ "  + str((time.time() - start))
+    print "center info:: agency.pred_succ "  + str((time.time() - start))
 
     # add test methods into target set
-    #start = time.time()
+    start = time.time()
     test_set = agency.get_test_set_dyn(target_set, callee_of, junit_torun)
-    #print "center info:: agency get test set dyn: " + str((time.time() - start))
+    print "center info:: agency get test set dyn: " + str((time.time() - start))
     #test_set is correct
     # reset target set here
-    #start = time.time()
+    start = time.time()
     refined_target_set, changed_methods, changed_tests = \
         agency.refine_targets(full_method_info_map, target_set, test_set,
                               caller_of, callee_of, pred_of, succ_of,
                               changed_methods, changed_tests,
                               inner_dataflow_methods, outer_dataflow_methods, json_filepath)
-    #print "center info:: agency refine targets: " + str((time.time() - start))
-    #start = time.time()
+    print "center info:: agency refine targets: " + str((time.time() - start))
+    start = time.time()
     profiler.log_csv(["method_count", "test_count", "refined_target_count"],
                      [[len(target_set), len(test_set), len(refined_target_set)]],
                      go + "_getty_y_method_count_" + this_hash + "_.profile.readable")
     print "center info:: profiler.log_csv " + str((time.time() - start))
     start = time.time()
     git.clear_temp_checkout(this_hash)
-    #print "center info:: clear temp checkout: " + str((time.time() - start))
-    
+    print "center info:: clear temp checkout: " + str((time.time() - start))
+
     return common_package, test_set, refined_target_set, changed_methods, changed_tests, \
-        cp, junit_torun, full_method_info_map
+           cp, junit_torun, full_method_info_map
 
 
 def read_in_types_to_methods(go, this_hash):
@@ -455,10 +473,12 @@ def create_methods_to_tests(fname, junit_torun):
 def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, analysis_only=False):
     
     if not analysis_only:
+        start = time.time()
         os.sys_call("git checkout " + this_hash)
-    #start = time.time()
+        print "center one_inv_psss: syscall git checkout " + str((time.time() - start))
+    start = time.time()
     os.sys_call("mvn clean")
-    #print "center mvn clean: " + str((time.time() - start))
+    print "center one_inv_psss: syscall mvn clean " + str((time.time() - start))
     
     if SHOW_DEBUG_INFO:
         print "\n===full classpath===\n" + cp + "\n"
@@ -472,8 +492,10 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, analysis_on
                          ])
     
     # os.sys_call("mvn test -DskipTests", ignore_bad_exit=True)
+    start = time.time()
     os.sys_call("mvn test-compile")
-    
+    print "center one_inv_psss: syscall mvn test-compile " + str((time.time() - start))
+
     if SHOW_DEBUG_INFO:
         print "\n===junit torun===\n" + junit_torun + "\n"
     
@@ -481,27 +503,24 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, analysis_on
     num_primary_workers = config.num_master_workers
     auto_parallel_targets = config.auto_fork
     slave_load = config.classes_per_fork
-    #start = time.time()
+    start = time.time()
     target_map = daikon.target_s2m(refined_target_set)
-    #print "daikon tart_s2m: " + str((time.time() - start))
+    print "center one_inv_pass: daikon get target map: " + str((time.time() - start))
     all_classes = target_map.keys()
     
     consider_expansion = (not analysis_only)
-    
+
+    start = time.time()
     if len(refined_target_set) <= num_primary_workers or (num_primary_workers == 1 and not auto_parallel_targets):
         single_set_tuple = (refined_target_set, "0")
-        #start = time.time()
         seq_get_invs(single_set_tuple, java_cmd, junit_torun, go, this_hash, consider_expansion)
-        #print "center seq get invs: " + str((time.time() - start))
     elif num_primary_workers > 1:  # FIXME: this distributation is buggy
         target_set_inputs = []
         all_target_set_list = list(refined_target_set)
         each_bulk_size = int(len(refined_target_set) / num_primary_workers)
-        start = time.time()
         seq_func = partial(seq_get_invs, 
                            java_cmd=java_cmd, junit_torun=junit_torun, go=go, this_hash=this_hash,
                            consider_expansion=consider_expansion)
-        #print "center partial: " + str((time.time() - start))
         for i in range(num_primary_workers):
             if not(i == num_primary_workers - 1):
                 sub_list_tuple = (all_target_set_list[each_bulk_size*i:each_bulk_size*(i+1)], str(i))                
@@ -509,12 +528,10 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, analysis_on
             else:
                 sub_list_tuple = (all_target_set_list[each_bulk_size*i:], str(i))
                 target_set_inputs.append(sub_list_tuple)
-        #start = time.time()
         input_pool = Pool(num_primary_workers)
         input_pool.map(seq_func, target_set_inputs)
         input_pool.close()
         input_pool.join()
-        #print "center input pool stuff: " + str((time.time() - start))
     elif num_primary_workers == 1 and auto_parallel_targets and slave_load >= 1:
         # elastic automatic processing
         target_set_inputs = []
@@ -523,12 +540,10 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, analysis_on
         # target_map has been calculated already
         # target_map = daikon.target_s2m(refined_target_set)
         # all_classes = target_map.keys()
-        #start = time.time()
         num_keys = len(all_classes)
         seq_func = partial(seq_get_invs, 
                            java_cmd=java_cmd, junit_torun=junit_torun, go=go, this_hash=this_hash,
                            consider_expansion=consider_expansion)
-        #print "center partial: " + str((time.time() - start))
         
         for i in range(0, num_keys, slave_load):
             # (inclusive) lower bound is i
@@ -560,26 +575,32 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, analysis_on
         print "\tauto_parallel_targets:", str(auto_parallel_targets)
         print "\tslave_load", str(slave_load)
         sys.exit(1)
-    
+    print "center inv_pass seq get invs " + str((time.time() - start))
+    start = time.time()
     if config.compress_inv:
         os.remove_many_files(go, "*.inv.gz")
     else:
         os.remove_many_files(go, "*.inv")
-    
+    print "center one_inv_pass: remove inv files " + str((time.time() - start))
     # include coverage report for compare
     if config.analyze_test_coverage and not analysis_only:
         try:
+            start = time.time()
             mvn.generate_coverage_report(go, this_hash)
+            print "center inv_pass: mvn.generate coverage report " + str((time.time() - start))
         except:
             pass
     
     if not analysis_only:
+        start = time.time()
         git.clear_temp_checkout(this_hash)
-    
+        print "center inv_pass: clear temp checkout" + str((time.time() - start))
     
     if config.class_level_expansion:
+        start = time.time()
         extra_expansion = get_expansion_set(go)
         os.remove_many_files(go, config.expansion_tmp_files + "*")
+        print "center inv_pass: remove expansion tmp files " + str((time.time() - start))
     else:
         extra_expansion = None
     
@@ -589,31 +610,52 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, analysis_on
 def mixed_passes(go, prev_hash, post_hash, refined_expansion_set,
                  refined_target_set, old_refined_target_set, new_refined_target_set,
                  old_cp, new_cp, old_junit_torun, new_junit_torun):
+
     if config.class_level_expansion:
         impact_set = refined_target_set | refined_expansion_set
     else:
         impact_set = refined_target_set
+    print "center mixed_passes: get refined target set" + str((time.time() - start))
     # checkout old commit, then checkout new tests
+    start = time.time()
     os.sys_call("git checkout " + prev_hash)
+    print "center mixed_passes: git checkout prev haash" + str((time.time() - start))
+    start = time.time()
     new_test_path = mvn.path_from_mvn_call("testSourceDirectory")
+    print "center mixed_passes: path form mvn call to get new test path" + str((time.time() - start))
+    start = time.time()
     os.sys_call(" ".join(["git", "checkout", post_hash, new_test_path]))
-#     # may need to check whether it is compilable, return code?
-#     os.sys_call("mvn clean test-compile")
+    print "center mixed_passes: git checkout post hash new test path" + str((time.time() - start))
+    #     # may need to check whether it is compilable, return code?
+    #     os.sys_call("mvn clean test-compile")
+    start = time.time()
     one_inv_pass(go, new_cp, new_junit_torun,
                  prev_hash + "_" + post_hash,
                  impact_set, analysis_only=True)
+    print "center mixed_passes: one inv pass" + str((time.time() - start))
+    start = time.time()
     git.clear_temp_checkout(prev_hash)
-    
+    print "center mixed_passes: git clear temp checkout prev hash" + str((time.time() - start))
     # checkout old commit, then checkout new src
+    start = time.time()
     os.sys_call("git checkout " + prev_hash)
+    print "center mixed_passes: git check out prev" + str((time.time() - start))
+    start = time.time()
     new_src_path = mvn.path_from_mvn_call("sourceDirectory")
+    print "center mixed_passes: get new src path path form mvn call" + str((time.time() - start))
+    start = time.time()
     os.sys_call(" ".join(["git", "checkout", post_hash, new_src_path]))
-#     # may need to check whether it is compilable, return code?
-#     os.sys_call("mvn clean test-compile")
+    print "center mixed_passes: git checkout post hash new src path" + str((time.time() - start))
+    #     # may need to check whether it is compilable, return code?
+    #     os.sys_call("mvn clean test-compile")
+    start = time.time()
     one_inv_pass(go, new_cp, old_junit_torun,
                  post_hash + "_" + prev_hash,
                  impact_set, analysis_only=True)
+    print "center mixed_passes: one inv pass" + str((time.time() - start))
+    start = time.time()
     git.clear_temp_checkout(prev_hash)
+    print "center mixed_passes: git clear temp checkout prev hash" + str((time.time() - start))
 
 
 def __build_target2ln(infomap):
@@ -648,46 +690,72 @@ def __purify_targets(targets):
 
 def _merge_target_sets(old_rts, new_rts, old_mtd_info_map, new_mtd_info_map):
     result = set()
+    start = time.time()
     old_mtd2ln = __build_target2ln(old_mtd_info_map)
+    print "center merge target sets:: build_target2ln old" + str((time.time() - start))
+    start = time.time()
     old_rts_purified = __purify_targets(old_rts)
+    print "center merge target sets:: purify targets old" + str((time.time() - start))
+    start = time.time()
     old_keyset = set(old_mtd2ln.keys())
+    print "center merge target sets:: get key set old" + str((time.time() - start))
+    start = time.time()
     new_mtd2ln = __build_target2ln(new_mtd_info_map)
+    print "center merge target sets:: build target2ln new" + str((time.time() - start))
+    start = time.time()
     new_rts_purified = __purify_targets(new_rts)
+    print "center merge target sets:: purify targets new" + str((time.time() - start))
+    start = time.time()
     new_keyset = set(new_mtd2ln.keys())
+    print "center merge target sets:: purify targets new" + str((time.time() - start))
+    start = time.time()
     for old_and_new in (old_rts_purified & new_rts_purified):
         mtd_full_info = old_and_new + "-" + old_mtd2ln[old_and_new] + "," + new_mtd2ln[old_and_new]
         result.add(mtd_full_info)
+    print "center merge target sets:: old and new add result" + str((time.time() - start))
+    start = time.time()
     for old_but_new in (old_rts_purified - new_rts_purified):
         if old_but_new in new_keyset:
             mtd_full_info = old_but_new + "-" + old_mtd2ln[old_but_new] + "," + new_mtd2ln[old_but_new]
         else:
             mtd_full_info = old_but_new + "-" + old_mtd2ln[old_but_new] + ",0"
         result.add(mtd_full_info)
+    print "center merge target sets:: just old add result" + str((time.time() - start))
+    start = time.time()
     for new_but_old in (new_rts_purified - old_rts_purified):
         if new_but_old in old_keyset:
             mtd_full_info = new_but_old + "-" + old_mtd2ln[new_but_old] + "," + new_mtd2ln[new_but_old]
         else:
             mtd_full_info = new_but_old + "-0," + new_mtd2ln[new_but_old]
         result.add(mtd_full_info)
+    print "center merge target sets:: just new add result" + str((time.time() - start))
     return result
 
 
 def _append_class_ln(class_set):
     result = set()
+    start = time.time()
     for c in class_set:
         result.add(c + "-0,0")
+    print "center append class ln:: for each c append -0,0" + str((time.time() - start))
     return result
 
 
 def _common_specific_expansion(expansion, old_method_info_map, new_method_info_map):
+    start = time.time()
     old_m2l = __build_method2line(old_method_info_map)
+    print "center common specific expansion:: build method 2line old" + str((time.time() - start))
+    start = time.time()
     new_m2l = __build_method2line(new_method_info_map)
+    print "center common specific expansion:: build method 2line new" + str((time.time() - start))
     common_keys = set(old_m2l.keys()) & set(new_m2l.keys())
     result = set()
+    start = time.time()
     for candidate in expansion:
         if candidate in common_keys:
             complete_info_name = candidate + "-" + old_m2l[candidate] + "," + new_m2l[candidate]
             result.add(complete_info_name)
+    print "center common specific expansion:: get candidates in expansion" + str((time.time() - start))
     return result
 
 
@@ -695,14 +763,14 @@ def _common_specific_expansion(expansion, old_method_info_map, new_method_info_m
 def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, prev_hash, post_hash, targets, iso,
           old_changed_methods, old_changed_tests, old_inner_dataflow_methods, old_outer_dataflow_methods,
           new_changed_methods, new_changed_tests, new_inner_dataflow_methods, new_outer_dataflow_methods, json_filepath):
-    
+
     dyng_go = separate_go[0]
     go = separate_go[1]
-    
+
     print("\n****************************************************************");
     print("        Getty Center: Semantiful Differential Analyzer            ");
     print("****************************************************************\n");
-    
+
     '''
         1-st pass: checkout prev_commit as detached head, and get new interested targets
     '''
@@ -727,19 +795,19 @@ def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, pre
     '''
         middle pass: set common interests
     '''
-    #start = time.time()
+    start = time.time()
     common_package = ''
     if old_common_package != '' and new_common_package != '':
-        if (len(old_common_package) < len(new_common_package) and 
+        if (len(old_common_package) < len(new_common_package) and
                 (new_common_package+'.').find(old_common_package+'.') == 0):
             common_package = old_common_package
-        elif (len(old_common_package) >= len(new_common_package) and 
-                (old_common_package+'.').find(new_common_package+'.') == 0):
+        elif (len(old_common_package) >= len(new_common_package) and
+              (old_common_package+'.').find(new_common_package+'.') == 0):
             common_package = old_common_package
     config.the_common_package.append(common_package)
-    #print "center config.common package: " + str((time.time() - start))
-#     refined_target_set = old_refined_target_set | new_refined_target_set
-    #start = time.time()
+    print "center config.common package: " + str((time.time() - start))
+    #     refined_target_set = old_refined_target_set | new_refined_target_set
+    start = time.time()
     refined_target_set, all_changed_methods, all_changed_tests = \
         _merge_target_sets(
             old_refined_target_set, new_refined_target_set, old_method_info_map, new_method_info_map), \
@@ -747,58 +815,62 @@ def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, pre
             old_changed_methods, new_changed_methods, old_method_info_map, new_method_info_map), \
         _merge_target_sets(
             old_changed_tests, new_changed_tests, old_method_info_map, new_method_info_map)
-    #print "center 3 merge target sets: " + str((time.time() - start))
+    print "center merge targets: " + str((time.time() - start))
     '''
         3-rd pass: checkout prev_commit as detached head, and get invariants for all interesting targets
     '''
-    #start = time.time()
+    start = time.time()
     old_all_classes, old_expansion = one_inv_pass(go,
-        old_cp, old_junit_torun, prev_hash, refined_target_set)
-    #print "center first one inv pass: " + str((time.time() - start))
+                                                  old_cp, old_junit_torun, prev_hash, refined_target_set)
+    print "center first one inv pass: " + str((time.time() - start))
     '''
         4-th pass: checkout post_commit as detached head, and get invariants for all interesting targets
     '''
-    #start = time.time()
+    start = time.time()
     new_all_classes, new_expansion = one_inv_pass(go,
-        new_cp, new_junit_torun, post_hash, refined_target_set)
-    #print "center second one inv pass: " + str((time.time() - start))
+                                                  new_cp, new_junit_torun, post_hash, refined_target_set)
+    print "center second one inv pass: " + str((time.time() - start))
 
-    #start = time.time()
     common_expansion = set()
     refined_expansion_set = set()
     if config.class_level_expansion:
+        start = time.time()
         common_expansion = old_expansion & new_expansion
         refined_expansion_set = _common_specific_expansion(
             common_expansion, old_method_info_map, new_method_info_map)
+        print "center common specific expansion: " + str((time.time() - start))
     #print "center get common expansion: " + str((time.time() - start))
     '''
         more passes: checkout mixed commits as detached head, and get invariants for all interesting targets
     '''
     if iso:
+        start = time.time()
         mixed_passes(go, prev_hash, post_hash, refined_expansion_set,
                      refined_target_set, old_refined_target_set, new_refined_target_set,
                      old_cp, new_cp, old_junit_torun, new_junit_torun)
-    
+        print "center common mixed passes: " + str((time.time() - start))
     '''
         last pass: set common interests
     '''
-    #start = time.time()
+    start = time.time()
     html.src_to_html_ln_anchor(refined_target_set, go, prev_hash, for_old=True)
     html.src_to_html_ln_anchor(refined_target_set, go, post_hash)
-    #print "center src to html ln anchor: " + str((time.time() - start))
+    print "center src to html ln anchor: " + str((time.time() - start))
     # should not need line number information anymore from this point on
-    
+
     '''
         prepare to return
     '''
-    #start = time.time()
+    start = time.time()
     all_classes_set = set(old_all_classes + new_all_classes)
+    print "center append set: " + str((time.time() - start))
+    start = time.time()
     all_classes_set = _append_class_ln(all_classes_set)
-    #print "center append class ln: " + str((time.time() - start))
-    
+    print "center append class ln: " + str((time.time() - start))
+
     print 'Center analysis is completed.'
     return common_package, all_classes_set, refined_target_set, \
-        old_test_set, old_refined_target_set, new_test_set, new_refined_target_set, \
-        old_changed_methods, new_changed_methods, old_changed_tests, new_changed_tests, \
-        all_changed_methods, all_changed_tests
+           old_test_set, old_refined_target_set, new_test_set, new_refined_target_set, \
+           old_changed_methods, new_changed_methods, old_changed_tests, new_changed_tests, \
+           all_changed_methods, all_changed_tests
 
