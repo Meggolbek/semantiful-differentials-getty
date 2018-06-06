@@ -1,6 +1,7 @@
 # get interested runtime targets
 
 import re
+import time
 from copy import deepcopy
 
 import config
@@ -8,11 +9,14 @@ from tools.ex import read_str_from
 
 
 def investigate(old_all_methods, new_all_methods):
+    start = time.time()
     all_interested = set(old_all_methods + new_all_methods)
+    print " AGEENNCYYY investigate: set" + str((time.time()-start))
     return all_interested
 
 
 def construct_invocation_map(triples_file):
+    start_func = time.time()
     triples = read_str_from(triples_file)
     to_map = {}
     from_map = {}
@@ -36,6 +40,7 @@ def construct_invocation_map(triples_file):
         else:
             from_map[passive] = {}
             from_map[passive][active] = count
+    print "agencyyyyy construct invocation map finish " + str(time.time() - start_func)
     return from_map, to_map
 
 

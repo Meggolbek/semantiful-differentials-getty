@@ -1,6 +1,7 @@
 # git calls
 
 import re
+import time
 
 from tools.os import from_sys_call, sys_call
 
@@ -69,16 +70,26 @@ def get_remote_head():
 
 
 def get_current_head_branch():
+    start = time.time()
     branches_str = from_sys_call("git branch --list").strip()
+    print "GIITTTT get_crnt brnch: get branches str" + str(time.time() - start)
+    start = time.time()
     branches_unpolished = branches_str.split("\n")
+    print "GIITTTT get_crnt brnch: split branches str" + str(time.time() - start)
     for branch_unpolished in branches_unpolished:
+        start = time.time()
         branch_raw = branch_unpolished.strip()
+        print "GIITTTT get_crnt brnch: strip branch str" + str(time.time() - start)
         if branch_raw[0] == "*":
+            start = time.time()
             m = re.compile("^\* \((detached from|HEAD detached at) ([a-z0-9]{5,})\)$").match(branch_raw)
+            print "GIITTTT get_crnt brnch: first re compile" + str(time.time() - start)
             if m:
                 return m.group(2)
+            start = time.time()
             b = re.compile("^\* ([a-zA-Z0-9\-_]+)$").match(branch_raw)
             if b:
+                print "GIITTTT get_crnt brnch: 2nd re compile" + str(time.time() - start)
                 return b.group(1)
             raise ValueError("unhandled branch name: " + branch_raw[2:].strip())
     raise EnvironmentError("no current head branch is listed")
@@ -86,8 +97,12 @@ def get_current_head_branch():
 
 # use with restore_and_pop_last, with care
 def backup_and_stash_first():
+    start = time.time()
     sys_call("git reset HEAD .")
+    print "GIITTTT back up and stash: sys_call git reset HEAD" + str(time.time() - start)
+    start = time.time()
     resp = from_sys_call("git stash save --keep-index --include-untracked").strip()
+    print "GIITTTT back up and stash: from_sys_call git stash save" + str(time.time() - start)
     if resp == "No local changes to save":
         return False
     else:
@@ -97,14 +112,22 @@ def backup_and_stash_first():
 # use with backup_and_stash_first, with care
 # should_further_recover is the return value of backup_and_stash_first
 def restore_and_pop_last(head_branch, should_further_recover):
+    time.time()
     sys_call("git checkout " + head_branch)
+    print "GIITTTT restore and pop last: syscall git chekcout" + str(time.time() - start)
     if should_further_recover:
+        time.time()
         sys_call("git stash pop", ignore_bad_exit=True)
+        print "GIITTTT restore and pop last: syscall git stash pop" + str(time.time() - start)
 
 
 def clear_temp_checkout(current_commit):
+    time.time()
     sys_call("git reset --hard " + current_commit)
+    print "GIITTTT clear temp checkout: git reset --hard" + str(time.time() - start)
+    time.time()
     resp = from_sys_call("git stash save --keep-index --include-untracked").strip()
+    print "GIITTTT clear temp checkout: syscall git stash save" + str(time.time() - start)
     if resp != "No local changes to save":
         sys_call("git stash drop")
 

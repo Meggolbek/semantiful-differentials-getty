@@ -68,7 +68,7 @@ def junit_torun_str(cust_mvn_repo):
         print "mvn junit_torun_str:: get filtered" + str((time.time() - start))
         return " ".join(["org.junit.runner.JUnitCore"] + filtered)
     else:
-        #start = time.time()
+        start = time.time()
         local_repo = ""
         if config.effortless_mvn_setup:
             local_repo = "-Dmaven.repo.local=" + cust_mvn_repo
@@ -92,8 +92,8 @@ def junit_torun_str(cust_mvn_repo):
             output = output_raw[start_index:].split("\n")
         else:
             raise
-        #print "mvn junit_torun_str:: in else series of if statments" + str((time.time() - start))
-        #start.time.time()
+        print "mvn junit_torun_str:: check what kind of surefire" + str((time.time() - start))
+        start.time.time()
         merged_run = {}
         for junit_torun in output:
             junit_torun = junit_torun.strip()
@@ -105,13 +105,13 @@ def junit_torun_str(cust_mvn_repo):
                 merged_run[runner] = (test_classes | merged_run[runner])
             else:
                 merged_run[runner] = test_classes
-        #print "mvn junit_torun_str:: in else for statement" + str((time.time() - start))
-        #start = time.time()
+        print "mvn junit_torun_str:: set merged_run[runner] to test classes if runner exists" + str((time.time() - start))
+        start = time.time()
         if len(merged_run) < 1:
             raise NotImplementedError("this project is not using junit")
         elif len(merged_run) == 1:
             junit_runner = merged_run.keys()[0]
-         #   print "mvn junit_torun_str:: in else before return" + str((time.time() - start))
+            print "mvn junit_torun_str:: get junit runner" + str((time.time() - start))
             return " ".join([junit_runner] + list(merged_run[junit_runner]))
         else:
             raise NotImplementedError("multiple junit versions are used in this project")

@@ -45,24 +45,37 @@ def show_help():
 
 def config_env():
     # Villa's jar path
+    start = time.time()
     this_script_path = os.path.abspath(getsourcefile(lambda:0))
+    print "CSII CONFIG ENV: get csi script path " + str(time.time() - start)
     if this_script_path[-1] == "/":
         this_script_path = this_script_path[:-1]
+
+    start = time.time()
     this_script_dir = this_script_path[:this_script_path.rfind("/")+1]
+    print "CSII CONFIG ENV: get csi script dir "
+    start = time.time()
     villa_path = this_script_dir + "lib/villa-2.0.jar"  # jar is at the same dir
+    print "CSII CONFIG ENV: get villa jar path " + str(time.time() - start)
+    start = time.time()
     junit_path = this_script_dir + "lib/junit-" + config.default_junit_version + ".jar"  # jar (junit) is at the same dir
+    print "CSII CONFIG ENV: get lib/junit jar path " + str(time.time() - start)
+    start = time.time()
     agent_path = this_script_dir + "lib/jdyncg-0.5-getty-dycg-agent.jar"  # jar is at the same dir
+    print "CSII CONFIG ENV: get lib/dycg-agent jar path " + str(time.time() - start)
+    start = time.time()
     if os.path.exists(villa_path) and os.path.exists(junit_path) and os.path.exists(agent_path):
         print "\nvilla-x.x.jar path: " + villa_path
         print "\njunit-x-getty.jar path: " + junit_path
         print "\njdyncg-0.x-getty-dycg-agent.jar path: " + agent_path
+        print "CSII CONFIG ENV: path checks " + str(time.time() - start)
     elif not os.path.exists(villa_path):
         raise EnvironmentError("could not find villa-x.x.jar in script dir " + this_script_dir)
     elif not os.path.exists(junit_path):
         raise EnvironmentError("could not find junit-x.jar (for getty) in script dir " + this_script_dir)
     elif not os.path.exists(agent_path):
         raise EnvironmentError("could not find jdyncg-0.x-getty-dycg-agent.jar in script dir " + this_script_dir)
-    
+    start = time.time()
     # System classpath
     hamcrest_path = this_script_dir + "lib/hamcrest-all-1.3.jar"
     getopt_path = this_script_dir + "lib/java-getopt.jar"
@@ -71,23 +84,30 @@ def config_env():
     rt_path = this_script_dir + "lib/rt.jar"
     jce_path = this_script_dir + "lib/jce.jar"
     tools_path = this_script_dir + "lib/tools.jar"
+    print "CSII CONFIG ENV: get numerous paths " + str(time.time() - start)
+
+    start = time.time()
     if os.path.exists(hamcrest_path) and os.path.exists(getopt_path) and os.path.exists(plume_path) and \
-        os.path.exists(daikon_path) and \
-        os.path.exists(rt_path) and os.path.exists(jce_path) and os.path.exists(tools_path):
+            os.path.exists(daikon_path) and \
+            os.path.exists(rt_path) and os.path.exists(jce_path) and os.path.exists(tools_path):
         print "\nSystem classpath is complete"
+        print "CSII CONFIG ENV: check numerous paths " + str(time.time() - start)
     else:
         raise EnvironmentError(
-                "\nSystem classpath is NOT complete. Check for hamcrest, getopt, plume, daikon, rt, jce, and tools.jar")
+            "\nSystem classpath is NOT complete. Check for hamcrest, getopt, plume, daikon, rt, jce, and tools.jar")
     sys_classpath = ":".join([hamcrest_path, getopt_path, plume_path, daikon_path, rt_path, jce_path, tools_path])
-    
+
     # present working directory - it should be the project's root with "/" at the end
+    start = time.time()
     pwd = cwd()
     if pwd[-1] != "/":
         pwd += "/"
-    
+    print "CSII CONFIG ENV: get current working directory " + str(time.time() - start)
+
     proj_dir = pwd
     dyng_go = pwd[:-1] + ".__getty_output__/"
     # getty output directory - /tmp/__getty_output__/ or ../projectname__getty_output__/
+    start = time.time()
     if pwd == "/":
         go = "/tmp/__getty_output__/"
         dyng_go = go
@@ -103,20 +123,22 @@ def config_env():
                 curr_dir = curr_dir[:last_slash+1]
         proj_dir = curr_dir
         go = curr_dir[:-1] + middle_path + ".__getty_output__/"
-        
+    print "CSII CONFIG ENV: get getty output directory " + str(time.time() - start)
+    start = time.time()
     if os.path.exists(go):
         if not os.path.isdir(go):
             raise EnvironmentError(go + " already exists but is not a directory")
     else:
         os.makedirs(go)
-    
+    print "CSII CONFIG ENV: check if go is dir " + str(time.time() - start)
+
     # javascript path
     fe_path = this_script_dir + "frontend/"
-    
+
     # FIXME: better copy to and use go folder
     cust_mvn_repo = this_script_dir + "lib/repository"
     return villa_path, junit_path, sys_classpath, agent_path, \
-        pwd, proj_dir, go, dyng_go, fe_path, cust_mvn_repo
+           pwd, proj_dir, go, dyng_go, fe_path, cust_mvn_repo
 
 
 def set_args():
@@ -124,58 +146,107 @@ def set_args():
     go_postfix = ""
     json_filepath = ""
     if len(sys.argv) == 1:
+        start = time.time()
         remote_head = get_remote_head()
+        print "CSII SET_ARGS: args 1 gert_remote_head " + str(time.time() - start)
+        start = time.time()
         prev_hash = get_hash(remote_head)
+        print "CSII SET_ARGS: args 1 get_hash remote head" + str(time.time() - start)
+        start = time.time()
         post_hash = get_hash("HEAD")
+        print "CSII SET_ARGS: args 1 get_hash HEAD " + str(time.time() - start)
     elif len(sys.argv) == 2:
         if sys.argv[1] == "-h" or sys.argv[1] == "--help":
+            start = time.time()
             show_help()
+            print "CSII SET_ARGS: args2 -h show help " + str(time.time() - start)
             exit(0)
         elif re.match("^-\d+", sys.argv[1]):
+            start = time.time()
             index = re.match("^-(\d+)", sys.argv[1]).group(1)
+            print "CSII SET_ARGS: args2 d regex index=re.match " + str(time.time() - start)
+            start = time.time()
             prev_hash = get_head_ancestor(index)
+            print "CSII SET_ARGS: args2 d regex get head ancestor " + str(time.time() - start)
+            start = time.time()
             post_hash = get_hash("HEAD")
+            print "CSII SET_ARGS: args2 d regex get head HEAD " + str(time.time() - start)
         elif not re.compile("[a-z0-9]{5,}").match(sys.argv[1]):
+            start = time.time()
             show_help()
+            print "CSII SET_ARGS: args2 regex and raise error " + str(time.time() - start)
             raise ValueError("invalid argument passed: " + sys.argv[1])
         else:
+            start = time.time()
             prev_hash = sys.argv[1]
+            print "CSII SET_ARGS: else regex prev_hash = 2nd args " + str(time.time() - start)
+            start = time.time()
             post_hash = get_hash("HEAD")
+            print "CSII SET_ARGS: args2 else get_hash " + str(time.time() - start)
     elif len(sys.argv) == 3 or len(sys.argv) == 4 or len(sys.argv) == 5:
+        start = time.time()
         hash_regex = "(([a-z0-9]{5,})|HEAD)(~(\d+)*){0,1}"
         index_regex = "(^-(\d+))|0"
         absolute_index_regex = "^~(\d+)"
+        print "CSII SET_ARGS: args3,4,5 sets numerous regex " + str(time.time() - start)
+        start = time.time()
         arg1_groups = re.match(hash_regex, sys.argv[1])
+        print "CSII SET_ARGS: args3,4,5 re.match hash 1 regex " + str(time.time() - start)
+        start = time.time()
         arg1_index = re.match(absolute_index_regex, sys.argv[1])
+        print "CSII SET_ARGS: args3,4,5 re.match absolute index regex " + str(time.time() - start)
+        start = time.time()
         arg2_groups = re.match(hash_regex, sys.argv[2])
+        print "CSII SET_ARGS: args3,4,5 re.match hash 2 regex " + str(time.time() - start)
         if (arg1_groups or arg1_index) and arg2_groups:
+            start = time.time()
             post_hash = get_hash(arg2_groups.group(0))
+            print "CSII SET_ARGS: args3,4,5 of re.match hash1 or arg1 index and re.match hash2: get_hash " + str(time.time() - start)
+            start = time.time()
             if arg1_groups:
                 prev_hash = get_hash(arg1_groups.group(0))
             elif arg1_index:
                 prev_hash = get_ancestor_hash(post_hash, index=arg1_index.group(1))
             else:
                 raise ValueError("recognized but wrongly formatted 1st argument: " + sys.argv[1])
+            print "CSII SET_ARGS: args3,4,5 of re.match hash1 or arg1 index and re.match hash2: get_hash or get ancesotr hash if statmts " + str(time.time() - start)
         elif (re.compile(index_regex).match(sys.argv[1]) or sys.argv[1] == "0") and \
                 (re.compile(index_regex).match(sys.argv[2]) or sys.argv[2] == "0"):
+            start = time.time()
             if sys.argv[1] == "0":
                 arg1 = "-0"
             else:
                 arg1 = sys.argv[1]
+            print "CSII SET_ARGS: args3,4,5 elif compileindex-Regx.match or sys arg1 = 0 and same but arg2: set arg1 " + str(time.time() - start)
+            start = time.time()
             prev_index = re.match(index_regex, arg1).group(2)
+            print "CSII SET_ARGS: args3,4,5 elif compileindex-Regx.match or sys arg1 = 0 and same but arg2: re.match(index_regex, arg1" + str(time.time() - start)
+            start = time.time()
             prev_hash = get_head_ancestor(prev_index)
+            print "CSII SET_ARGS: args3,4,5 elif compileindex-Regx.match or sys arg1 = 0 and same but arg2: get head ancestor prev " + str(time.time() - start)
+            start = time.time()
             if sys.argv[2] == "0":
                 arg2 = "-0"
             else:
                 arg2 = sys.argv[2]
+            print "CSII SET_ARGS: args3,4,5 elif compileindex-Regx.match or sys arg1 = 0 and same but arg2: set arg2 " + str(time.time() - start)
+            start = time.time()
             post_index = re.match(index_regex, arg2).group(2)
+            print "CSII SET_ARGS: args3,4,5 elif compileindex-Regx.match or sys arg1 = 0 and same but arg2: re.match(index_regex, arg2)  " + str(time.time() - start)
+            start = time.time()
             post_hash = get_head_ancestor(post_index)
+            print "CSII SET_ARGS: args3,4,5 elif compileindex-Regx.match or sys arg1 = 0 and same but arg2: get head ancestor post " + str(time.time() - start)
         else:
+            start = time.time()
             show_help()
+            print "CSII SET_ARGS: args3,4,5 elif else show help " + str(time.time() - start)
             raise ValueError("invalid arguments passed: " + sys.argv[1] + " and " + sys.argv[2])
         if len(sys.argv) == 4:
+            start = time.time()
             issue_specific_regex = "issue:(.*)"
             mts = re.match(issue_specific_regex, sys.argv[3])
+            print "CSII SET_ARGS: args4 elif re.match issue specific regex " + str(time.time() - start)
+            start = time.time()
             if mts:
                 go_postfix = mts.group(1) + "_" + prev_hash + "_" + post_hash + "/"
             elif sys.argv[3] == "-i":
@@ -186,9 +257,13 @@ def set_args():
             else:
                 show_help()
                 raise ValueError("last argument should be: [issue:...] or -i or file to json")
+            print "CSII SET_ARGS: args4 get postfixes or jsonfile path " + str(time.time() - start)
         if len(sys.argv) == 5:
+            start = time.time()
             issue_specific_regex = "issue:(.*)"
             mts = re.match(issue_specific_regex, sys.argv[3])
+            print "CSII SET_ARGS: args5 elif re.match issue specific regex " + str(time.time() - start)
+            start = time.time()
             if mts:
                 go_postfix = mts.group(1) + "_" + prev_hash + "_" + post_hash + "/"
             elif sys.argv[3] == "-i":
@@ -206,22 +281,23 @@ def set_args():
                 else:
                     show_help()
                     raise ValueError("last argument should be: [issue:...] or -i")
+                print "CSII SET_ARGS: args5 get postfixes or json file path" + str(time.time() - start)
             else:
                 show_help()
                 raise ValueError("last argument should be: [issue:...] or -i or file to json")
     else:
-        raise ValueError("number of arguments should be 0~3")
+        raise ValueError("number of arguments should be 0~5")
     # consider using `git rev-parse --short HEAD` if shorter names are preferred
 
     return prev_hash, post_hash, go_postfix, isolation, json_filepath
 
 
 if __name__ == "__main__":
-    
+    startOfGetty = time.time()
     ## env config
     start = time.time()
     villa_path, junit_path, sys_classpath, agent_path, \
-        pwd, proj_dir, go, dyng_go, fe_path, cust_mvn_repo = config_env()
+    pwd, proj_dir, go, dyng_go, fe_path, cust_mvn_repo = config_env()
     print "CSIIIII config_env: " + str((time.time() - start))
     ## args checking & setting
     start = time.time()
@@ -245,6 +321,8 @@ if __name__ == "__main__":
     '''
     start = time.time()
     working_branch = get_current_head_branch()
+    print "CSIII get current head branch " + str(time.time() - start)
+    start = time.time()
     should_further_recover = backup_and_stash_first()
     print "CSIII backup and stash: " + str((time.time()-start))
     # clean up output directory
@@ -272,34 +350,36 @@ if __name__ == "__main__":
     else:
         start = time.time()
         old_changed_methods, old_improved_changed_methods, old_added_changed_methods, \
-            old_all_methods, \
-            old_inner_dataflow_methods, old_outer_dataflow_methods, \
-            old_l2m, old_m2l, \
-            new_changed_methods, new_improved_changed_methods, new_removed_changed_methods, \
-            new_all_methods, \
-            new_inner_dataflow_methods, new_outer_dataflow_methods, \
-            new_l2m, new_m2l, \
-            old_changed_tests, new_changed_tests = \
-                villa.visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash)
+        old_all_methods, \
+        old_inner_dataflow_methods, old_outer_dataflow_methods, \
+        old_l2m, old_m2l, \
+        new_changed_methods, new_improved_changed_methods, new_removed_changed_methods, \
+        new_all_methods, \
+        new_inner_dataflow_methods, new_outer_dataflow_methods, \
+        new_l2m, new_m2l, \
+        old_changed_tests, new_changed_tests = \
+            villa.visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash)
         print " CSIIIII villa.visit: " + str((time.time()-start))
 
-#     # DEBUG ONLY
-#     print "Debug info: "
-#     print old_changed_methods
-#     print new_changed_methods
-#     print new_improved_changed_methods
-#     print new_removed_changed_methods
-    
+    #     # DEBUG ONLY
+    #     print "Debug info: "
+    #     print old_changed_methods
+    #     print new_changed_methods
+    #     print new_improved_changed_methods
+    #     print new_removed_changed_methods
+
+    start = time.time()
     targets = agency.investigate(old_all_methods, new_all_methods)
+    print " CSIIIII agency.investigate: " + str((time.time()-start))
     # up to this point, "allmtd"'s still contain the methods without parameters and line numbers, but all others do
-    
+
     common_package = ''
     all_classes_set = set()
     old_test_set = set()
     old_refined_target_set = set()
     new_test_set = set()
     new_refined_target_set = set()
-    
+
     if config.profile_performance:
         profiler.run_and_report(
             "common_package, all_classes_set, all_refined_target_set, old_test_set, old_refined_target_set, new_test_set, new_refined_target_set, \
@@ -311,36 +391,42 @@ if __name__ == "__main__":
     else:
         start = time.time()
         common_package, all_classes_set, all_refined_target_set, old_test_set, old_refined_target_set, new_test_set, new_refined_target_set, \
-            old_changed_methods, new_changed_methods, old_changed_tests, new_changed_tests, all_changed_methods, all_changed_tests = \
+        old_changed_methods, new_changed_methods, old_changed_tests, new_changed_tests, all_changed_methods, all_changed_tests = \
             center.visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, prev_hash, post_hash, targets, iso,
-                         old_improved_changed_methods, old_changed_tests, old_inner_dataflow_methods, old_outer_dataflow_methods, 
+                         old_improved_changed_methods, old_changed_tests, old_inner_dataflow_methods, old_outer_dataflow_methods,
                          new_improved_changed_methods, new_changed_tests, new_inner_dataflow_methods, new_outer_dataflow_methods, json_filepath)
-    print "CSIIII center.visit: " + str((time.time() - start))
+        print "CSIIII center.visit: " + str((time.time() - start))
 
     start = time.time()
     old_caller_of, old_callee_of = agency.caller_callee(go, prev_hash)
+    print "CSIIII agency caller_callee old: " + str((time.time() - start))
+    start = time.time()
     old_pred_of, old_succ_of = agency.pred_succ(go, prev_hash)
-    print "CSIIII agency caller_calle & pred_succ: " + str((time.time() - start))
+    print "CSIIII agency pred_succ old: " + str((time.time() - start))
+    start = time.time()
     new_caller_of, new_callee_of = agency.caller_callee(go, post_hash)
+    print "CSIIII agency caller_callee new: " + str((time.time() - start))
+    start = time.time()
     new_pred_of, new_succ_of = agency.pred_succ(go, post_hash)
-#     # DEBUG ONLY
-#     print "Debug info: "
-#     print old_caller_of
-#     print old_callee_of
-#     print old_pred_of
-#     print old_succ_of
-#     print new_caller_of
-#     print new_callee_of
-#     print new_pred_of
-#     print new_succ_of
-    
-#     # DEBUG ONLY
-#     for aset in [old_changed_methods, new_changed_methods, 
-#                  old_changed_tests, new_changed_tests,
-#                  old_refined_target_set, new_refined_target_set,
-#                  all_refined_target_set]:
-#         print aset
-#         print ""
+    print "CSIIII agency pred_succ new: " + str((time.time() - start))
+    #     # DEBUG ONLY
+    #     print "Debug info: "
+    #     print old_caller_of
+    #     print old_callee_of
+    #     print old_pred_of
+    #     print old_succ_of
+    #     print new_caller_of
+    #     print new_callee_of
+    #     print new_pred_of
+    #     print new_succ_of
+
+    #     # DEBUG ONLY
+    #     for aset in [old_changed_methods, new_changed_methods,
+    #                  old_changed_tests, new_changed_tests,
+    #                  old_refined_target_set, new_refined_target_set,
+    #                  all_refined_target_set]:
+    #         print aset
+    #         print ""
 
     '''
         before last: restore original branch and all its pending work
@@ -377,5 +463,5 @@ if __name__ == "__main__":
             old_test_set, new_test_set,
             prev_hash, post_hash, old_l2m, new_l2m, old_m2l, new_m2l)
         print "CSIIII gallery exam: " + str((time.time()-start))
-
+    print "End of Getty, total time: " + str((time.time() - startOfGetty))
     print 'Quit Getty.'
