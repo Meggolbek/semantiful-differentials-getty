@@ -128,7 +128,7 @@ def backup_and_stash_first():
 # use with backup_and_stash_first, with care
 # should_further_recover is the return value of backup_and_stash_first
 def restore_and_pop_last(head_branch, should_further_recover):
-    time.time()
+    start = time.time()
     sys_call("git checkout " + head_branch)
     print "GIITTTT restore and pop last: syscall git chekcout" + str(time.time() - start)
     if should_further_recover:
