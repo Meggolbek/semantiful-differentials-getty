@@ -140,7 +140,7 @@ def restore_and_pop_last(head_branch, should_further_recover):
 
 
 def clear_temp_checkout(current_commit):
-    time.time()
+    start = time.time()
     sys_call("git reset --hard " + current_commit)
     print "GIITTTT clear temp checkout: git reset --hard" + str(time.time() - start)
     time.time()
