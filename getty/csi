@@ -60,7 +60,7 @@ def config_env():
 
     start = time.time()
     this_script_dir = this_script_path[:this_script_path.rfind("/")+1]
-    print "CSII CONFIG ENV: get csi script dir "
+    print "CSII CONFIG ENV: get csi script dir " + str(time.time() - start)
     start = time.time()
     villa_path = this_script_dir + "lib/villa-2.0.jar"  # jar is at the same dir
     print "CSII CONFIG ENV: get villa jar path " + str(time.time() - start)
