@@ -94,9 +94,9 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
     target_set = target_set_index_pair[0]
     
 #     select_pattern = daikon.select_full(target_set)
-    start = time.time()
+#     start = time.time()
     select_pattern = daikon.dfformat_full_ordered(target_set)
-    print "center seq_get_invs: get select pattern" + str((time.time() - start))
+    # print "center seq_get_invs: get select pattern" + str((time.time() - start))
     print "\n=== select pattern ===\n" + select_pattern + "\n"
     
     inv_gz = go + "_getty_inv_" + this_hash + "_." + index
@@ -151,9 +151,9 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
         all_to_consider = (all_to_consider | expansion)
     
     for tgt in all_to_consider:
-        start = time.time()
+        # start = time.time()
         target_ff = daikon.fsformat_with_sigs(tgt)
-        print "center seq_get_invs: fsformat with sigs" + str((time.time() - start))
+        # print "center seq_get_invs: fsformat with sigs" + str((time.time() - start))
         out_file = go+"_getty_inv__"+target_ff+"__"+this_hash+"_.inv.out"
         run_printinv = \
             " ".join([java_cmd, "daikon.PrintInvariants",
@@ -268,18 +268,18 @@ def one_info_pass(
     print "center info:: daikon common prefixes " + str((time.time() - start))
     common_package = ''
     if len(prefixes) == 1:
-        start = time.time()
+        # start = time.time()
         last_period_index = prefixes[0].rindex('.')
         if last_period_index > 0:
             # the common package should be at least one period away from the rest
             common_package = prefixes[0][:last_period_index]
-        print "center info:: if len prefixes ==1 set common package " + str((time.time() - start))
+        # print "center info:: if len prefixes ==1 set common package " + str((time.time() - start))
     prefix_regexes = []
-    start = time.time()
+    # start = time.time()
     for p in prefixes:
         prefix_regexes.append(p + "*")
     instrument_regex = "|".join(prefix_regexes)
-    print "center info:: get instrument regex " + str((time.time() - start))
+    # print "center info:: get instrument regex " + str((time.time() - start))
     if SHOW_DEBUG_INFO:
         print "\n===instrumentation pattern===\n" + instrument_regex + "\n"
     # run tests with instrumentation
@@ -301,7 +301,7 @@ def one_info_pass(
                 ignore_bad_exit=True)
     print "center info::instrument tests and run: " + str((time.time() - start))
 
-    start = time.time()
+    # start = time.time()
 
     full_method_info_map = {}
     ext_start_index = len(config.method_info_line_prefix)
@@ -313,14 +313,14 @@ def one_info_pass(
                 rawdata = line[ext_start_index:]
                 k, v = rawdata.split(" : ")
                 full_method_info_map[k.strip()] = v.strip()
-    print "center info:: get full method info map: " + str((time.time() - start))
+    # print "center info:: get full method info map: " + str((time.time() - start))
     start = time.time()
     os.merge_dyn_files(dyng_go, go, "_getty_dyncg_-hash-_.ex", this_hash)
     print "center info:: merge dyn files cg: " + str((time.time() - start))
-    start = time.time()
+    # start = time.time()
     os.merge_dyn_files(dyng_go, go, "_getty_dynfg_-hash-_.ex", this_hash)
     #print "center info:: merge dyn files" + str((time.time() - start))
-    print "center info:: merge dyn files fg: " + str((time.time() - start))
+    # print "center info:: merge dyn files fg: " + str((time.time() - start))
     start_if = time.time()
     if json_filepath != "":
         ######getting method -> tests info
@@ -390,26 +390,26 @@ def one_info_pass(
         print "center info:: get new junit_torun " + str((time.time() - start))
     print "center info:: if json "  + str((time.time() - start_if))
 
-    start = time.time()
+    # start = time.time()
     caller_of, callee_of = agency.caller_callee(go, this_hash)
-    print "center info:: agency.caller_callee "  + str((time.time() - start))
-    start = time.time()
+    # print "center info:: agency.caller_callee "  + str((time.time() - start))
+    # start = time.time()
     pred_of, succ_of = agency.pred_succ(go, this_hash)
-    print "center info:: agency.pred_succ "  + str((time.time() - start))
+    # print "center info:: agency.pred_succ "  + str((time.time() - start))
 
     # add test methods into target set
-    start = time.time()
+    # start = time.time()
     test_set = agency.get_test_set_dyn(target_set, callee_of, junit_torun)
-    print "center info:: agency get test set dyn: " + str((time.time() - start))
+    # print "center info:: agency get test set dyn: " + str((time.time() - start))
     #test_set is correct
     # reset target set here
-    start = time.time()
+    # start = time.time()
     refined_target_set, changed_methods, changed_tests = \
         agency.refine_targets(full_method_info_map, target_set, test_set,
                               caller_of, callee_of, pred_of, succ_of,
                               changed_methods, changed_tests,
                               inner_dataflow_methods, outer_dataflow_methods, json_filepath)
-    print "center info:: agency refine targets: " + str((time.time() - start))
+    # print "center info:: agency refine targets: " + str((time.time() - start))
     start = time.time()
     profiler.log_csv(["method_count", "test_count", "refined_target_count"],
                      [[len(target_set), len(test_set), len(refined_target_set)]],
@@ -699,45 +699,45 @@ def __purify_targets(targets):
 
 def _merge_target_sets(old_rts, new_rts, old_mtd_info_map, new_mtd_info_map):
     result = set()
-    start = time.time()
+    # start = time.time()
     old_mtd2ln = __build_target2ln(old_mtd_info_map)
-    print "center merge target sets:: build_target2ln old" + str((time.time() - start))
-    start = time.time()
+    # print "center merge target sets:: build_target2ln old" + str((time.time() - start))
+    # start = time.time()
     old_rts_purified = __purify_targets(old_rts)
-    print "center merge target sets:: purify targets old" + str((time.time() - start))
-    start = time.time()
+    # print "center merge target sets:: purify targets old" + str((time.time() - start))
+    # start = time.time()
     old_keyset = set(old_mtd2ln.keys())
-    print "center merge target sets:: get key set old" + str((time.time() - start))
-    start = time.time()
+    # print "center merge target sets:: get key set old" + str((time.time() - start))
+    # start = time.time()
     new_mtd2ln = __build_target2ln(new_mtd_info_map)
-    print "center merge target sets:: build target2ln new" + str((time.time() - start))
-    start = time.time()
+    # print "center merge target sets:: build target2ln new" + str((time.time() - start))
+    # start = time.time()
     new_rts_purified = __purify_targets(new_rts)
-    print "center merge target sets:: purify targets new" + str((time.time() - start))
-    start = time.time()
+    # print "center merge target sets:: purify targets new" + str((time.time() - start))
+    # start = time.time()
     new_keyset = set(new_mtd2ln.keys())
-    print "center merge target sets:: purify targets new" + str((time.time() - start))
-    start = time.time()
+    # print "center merge target sets:: purify targets new" + str((time.time() - start))
+    # start = time.time()
     for old_and_new in (old_rts_purified & new_rts_purified):
         mtd_full_info = old_and_new + "-" + old_mtd2ln[old_and_new] + "," + new_mtd2ln[old_and_new]
         result.add(mtd_full_info)
-    print "center merge target sets:: old and new add result" + str((time.time() - start))
-    start = time.time()
+    # print "center merge target sets:: old and new add result" + str((time.time() - start))
+    # start = time.time()
     for old_but_new in (old_rts_purified - new_rts_purified):
         if old_but_new in new_keyset:
             mtd_full_info = old_but_new + "-" + old_mtd2ln[old_but_new] + "," + new_mtd2ln[old_but_new]
         else:
             mtd_full_info = old_but_new + "-" + old_mtd2ln[old_but_new] + ",0"
         result.add(mtd_full_info)
-    print "center merge target sets:: just old add result" + str((time.time() - start))
-    start = time.time()
+    # print "center merge target sets:: just old add result" + str((time.time() - start))
+    # start = time.time()
     for new_but_old in (new_rts_purified - old_rts_purified):
         if new_but_old in old_keyset:
             mtd_full_info = new_but_old + "-" + old_mtd2ln[new_but_old] + "," + new_mtd2ln[new_but_old]
         else:
             mtd_full_info = new_but_old + "-0," + new_mtd2ln[new_but_old]
         result.add(mtd_full_info)
-    print "center merge target sets:: just new add result" + str((time.time() - start))
+    # print "center merge target sets:: just new add result" + str((time.time() - start))
     return result
 
 
@@ -751,20 +751,20 @@ def _append_class_ln(class_set):
 
 
 def _common_specific_expansion(expansion, old_method_info_map, new_method_info_map):
-    start = time.time()
+    # start = time.time()
     old_m2l = __build_method2line(old_method_info_map)
-    print "center common specific expansion:: build method 2line old" + str((time.time() - start))
-    start = time.time()
+    # print "center common specific expansion:: build method 2line old" + str((time.time() - start))
+    # start = time.time()
     new_m2l = __build_method2line(new_method_info_map)
-    print "center common specific expansion:: build method 2line new" + str((time.time() - start))
+    # print "center common specific expansion:: build method 2line new" + str((time.time() - start))
     common_keys = set(old_m2l.keys()) & set(new_m2l.keys())
     result = set()
-    start = time.time()
+    # start = time.time()
     for candidate in expansion:
         if candidate in common_keys:
             complete_info_name = candidate + "-" + old_m2l[candidate] + "," + new_m2l[candidate]
             result.add(complete_info_name)
-    print "center common specific expansion:: get candidates in expansion" + str((time.time() - start))
+    # print "center common specific expansion:: get candidates in expansion" + str((time.time() - start))
     return result
 
 
@@ -870,9 +870,9 @@ def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, pre
     '''
         prepare to return
     '''
-    start = time.time()
+    # start = time.time()
     all_classes_set = set(old_all_classes + new_all_classes)
-    print "center append set: " + str((time.time() - start))
+    # print "center append set: " + str((time.time() - start))
     start = time.time()
     all_classes_set = _append_class_ln(all_classes_set)
     print "center append class ln: " + str((time.time() - start))
