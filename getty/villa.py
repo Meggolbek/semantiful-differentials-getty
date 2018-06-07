@@ -18,23 +18,23 @@ def checkout_build(proj_dir, commit_hash):
     start = time.time()
     bin_path = mvn.path_from_mvn_call("outputDirectory")
     print "villa checkoutbuild: path form mvn call to get bin path"+ str((time.time() - start))
-    start = time.time()
+    # start = time.time()
     src_rel_path = mvn.path_from_mvn_call("sourceDirectory")
-    print "villa checkoutbuild: path form mvn call to get src rel path"+ str((time.time() - start))
-    start = time.time()
+    # print "villa checkoutbuild: path form mvn call to get src rel path"+ str((time.time() - start))
+    # start = time.time()
     if src_rel_path.startswith(proj_dir):
         src_rel_path = src_rel_path[len(proj_dir):]
-        print "villa checkoutbuild: src rel path check"+ str((time.time() - start))
+        # print "villa checkoutbuild: src rel path check"+ str((time.time() - start))
     else:
         raise ValueError("proj_dir is not a prefix of src path")
     print "current src path (relative): " + src_rel_path + "\n"
-    start = time.time()
+    # start = time.time()
     test_src_rel_path = mvn.path_from_mvn_call("testSourceDirectory")
-    print "villa checkoutbuild: path form mvn call to get src rel path"+ str((time.time() - start))
-    start = time.time()
+    # print "villa checkoutbuild: path form mvn call to get src rel path"+ str((time.time() - start))
+    # start = time.time()
     if test_src_rel_path.startswith(proj_dir):
         test_src_rel_path = test_src_rel_path[len(proj_dir):]
-        print "villa checkoutbuild: test src rel path check"+ str((time.time() - start))
+        # print "villa checkoutbuild: test src rel path check"+ str((time.time() - start))
     else:
         raise ValueError("proj_dir is not a prefix of test src path")
     print "current test src path (relative): " + test_src_rel_path + "\n"
@@ -73,18 +73,18 @@ def visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash, pkg_prefix="-"):
     run_villa_l4ms = "java -jar {0} -l {1} {2} {3} -o {4}".format(
         villa_path, src_rel_path, test_src_rel_path, prev_hash, go)
     print "\n\nstart to run Villa ... \n\n" + run_villa + "\n  and  \n" + run_villa_l4ms
-    start = time.time()
+    # start = time.time()
     chdir(proj_dir)
-    print "villa visit::: chdir proj dir"+ str((time.time() - start))
+    # print "villa visit::: chdir proj dir"+ str((time.time() - start))
     start = time.time()
     os.sys_call(run_villa)
     print "villa visit::: sys call run_villa"+ str((time.time() - start))
     start = time.time()
     os.sys_call(run_villa_l4ms)
     print "villa visit::: syscall run_villa14ms"+ str((time.time() - start))
-    start = time.time()
+    # start = time.time()
     chdir(pwd)
-    print "villa visit::: chdir pwd"+ str((time.time() - start))
+    # print "villa visit::: chdir pwd"+ str((time.time() - start))
 
 
 

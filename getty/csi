@@ -321,7 +321,7 @@ if __name__ == "__main__":
 
 
     ## set new go folder if needed; keep old go folder for dynamic graph output
-    start = time.time()
+    # start = time.time()
     go += go_postfix
     if go_postfix != "":
         if os.path.exists(go):
@@ -330,7 +330,7 @@ if __name__ == "__main__":
         else:
             os.makedirs(go)
     separate_go = (dyng_go, go)
-    print "CSIIII create go folder: " + str((time.time()-start))
+    # print "CSIIII create go folder: " + str((time.time()-start))
 
 
     '''

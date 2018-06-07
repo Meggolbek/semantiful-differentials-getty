@@ -85,17 +85,17 @@ def get_current_head_branch():
     start = time.time()
     branches_str = from_sys_call("git branch --list").strip()
     print "GIITTTT get_crnt brnch: get branches str" + str(time.time() - start)
-    start = time.time()
+    # start = time.time()
     branches_unpolished = branches_str.split("\n")
-    print "GIITTTT get_crnt brnch: split branches str" + str(time.time() - start)
+    # print "GIITTTT get_crnt brnch: split branches str" + str(time.time() - start)
     for branch_unpolished in branches_unpolished:
-        start = time.time()
+        # start = time.time()
         branch_raw = branch_unpolished.strip()
-        print "GIITTTT get_crnt brnch: strip branch str" + str(time.time() - start)
+        # print "GIITTTT get_crnt brnch: strip branch str" + str(time.time() - start)
         if branch_raw[0] == "*":
-            start = time.time()
+            # start = time.time()
             m = re.compile("^\* \((detached from|HEAD detached at) ([a-z0-9]{5,})\)$").match(branch_raw)
-            print "GIITTTT get_crnt brnch: first re compile" + str(time.time() - start)
+            # print "GIITTTT get_crnt brnch: first re compile" + str(time.time() - start)
             if m:
                 return m.group(2)
             start = time.time()
