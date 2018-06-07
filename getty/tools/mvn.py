@@ -9,12 +9,12 @@ from tools.os import sys_call, from_sys_call_enforce
 
 # FIXME: support multi-module project
 def path_from_mvn_call(env):
-    start = time.time()
+    # start = time.time()
     if env not in ["sourceDirectory", "scriptSourceDirectory", "testSourceDirectory", 
                    "outputDirectory", "testOutputDirectory", "directory"]:
         raise ValueError("incorrect env var: " + env)
     mvn_cmd = "mvn help:evaluate -Dexpression=project.build." + env + " | grep ^/"
-    print "mvn path_from_mvn_call:: mvn cmd" + str((time.time() - start))
+    # print "mvn path_from_mvn_call:: mvn cmd" + str((time.time() - start))
     return subprocess.check_output(mvn_cmd, shell=True).strip()
 
 
@@ -24,7 +24,7 @@ def classpath_from_mvn_call():
     start = time.time()
     output = subprocess.check_output(mvn_cmd, shell=True).strip()
     print "mvn classpath_from_mvn_call:: check_output" + str((time.time() - start))
-    start = time.time()
+    # start = time.time()
     all_paths = set()
     classpaths = output.split("\n")
     for classpath in classpaths:
@@ -32,12 +32,12 @@ def classpath_from_mvn_call():
         for one_path in classpath.split(":"):
             if one_path not in all_paths:
                 all_paths.add(one_path)
-    print "mvn classpath_from_mvn_call:: all paths" + str((time.time() - start))
-    start = time.time()
+    # print "mvn classpath_from_mvn_call:: all paths" + str((time.time() - start))
+    # start = time.time()
     merged = "."
     for path in all_paths:
         merged += (":" + path)
-    print "mvn classpath_from_mvn_call:: merged" + str((time.time() - start))
+    # print "mvn classpath_from_mvn_call:: merged" + str((time.time() - start))
     return merged
 
 
@@ -58,14 +58,14 @@ def junit_torun_str(cust_mvn_repo):
         print '\nRunning tests to get all test & test cases ...'
         cmd_output = from_sys_call_enforce(extract_cmd).strip()
         print "mvn junit_torun_str:: from sys call enforce" + str((time.time() - start))
-        start = time.time()
+        #start = time.time()
         filtered = []
         matching = "Running (.*)"
         for candidate in cmd_output.split('\n'):
             m = re.match(matching, candidate.strip())
             if m and len(m.groups()) > 0:
                 filtered.append(m.group(1).strip().split(' ')[0])
-        print "mvn junit_torun_str:: get filtered" + str((time.time() - start))
+        #print "mvn junit_torun_str:: get filtered" + str((time.time() - start))
         return " ".join(["org.junit.runner.JUnitCore"] + filtered)
     else:
         start = time.time()
