@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="34efbc08-b5de-470b-9cd4-68e717261e52" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/getty/csi" afterPath="$PROJECT_DIR$/getty/csi" />
+      <change beforePath="$PROJECT_DIR$/getty/agency.py" afterPath="$PROJECT_DIR$/getty/agency.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,7 +14,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="750">
-      <file leaf-file-name="csi" pinned="false" current-in-tab="true">
+      <file leaf-file-name="csi" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/getty/csi">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="977">
@@ -62,11 +62,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="agency.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="agency.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/getty/agency.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2120">
-              <caret line="53" column="0" lean-forward="false" selection-start-line="53" selection-start-column="0" selection-end-line="53" selection-end-column="0" />
+            <state relative-caret-position="977">
+              <caret line="44" column="4" lean-forward="true" selection-start-line="44" selection-start-column="4" selection-end-line="44" selection-end-column="4" />
               <folding>
                 <element signature="e#35#44#0" expanded="true" />
               </folding>
@@ -145,13 +145,13 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/getty/agency.py" />
         <option value="$PROJECT_DIR$/getty/tools/git.py" />
         <option value="$PROJECT_DIR$/getty/tools/mvn.py" />
         <option value="$PROJECT_DIR$/getty/villa.py" />
         <option value="$PROJECT_DIR$/getty/tools/daikon.py" />
         <option value="$PROJECT_DIR$/getty/center.py" />
         <option value="$PROJECT_DIR$/getty/csi" />
+        <option value="$PROJECT_DIR$/getty/agency.py" />
       </list>
     </option>
   </component>
@@ -872,16 +872,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/getty/agency.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2120">
-          <caret line="53" column="0" lean-forward="false" selection-start-line="53" selection-start-column="0" selection-end-line="53" selection-end-column="0" />
-          <folding>
-            <element signature="e#35#44#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/getty/tools/git.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5200">
@@ -898,6 +888,16 @@
           <caret line="396" column="17" lean-forward="false" selection-start-line="396" selection-start-column="17" selection-end-line="396" selection-end-column="17" />
           <folding>
             <element signature="e#66#75#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/getty/agency.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="977">
+          <caret line="44" column="4" lean-forward="true" selection-start-line="44" selection-start-column="4" selection-end-line="44" selection-end-column="4" />
+          <folding>
+            <element signature="e#35#44#0" expanded="true" />
           </folding>
         </state>
       </provider>
