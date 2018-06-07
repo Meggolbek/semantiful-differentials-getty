@@ -63,12 +63,12 @@ def config_env():
     #start = time.time()
     agent_path = this_script_dir + "lib/jdyncg-0.5-getty-dycg-agent.jar"  # jar is at the same dir
     #print "CSII CONFIG ENV: get lib/dycg-agent jar path " + str(time.time() - start)
-    start = time.time()
+    # start = time.time()
     if os.path.exists(villa_path) and os.path.exists(junit_path) and os.path.exists(agent_path):
         print "\nvilla-x.x.jar path: " + villa_path
         print "\njunit-x-getty.jar path: " + junit_path
         print "\njdyncg-0.x-getty-dycg-agent.jar path: " + agent_path
-        print "CSII CONFIG ENV: getty path checks " + str(time.time() - start)
+        # print "CSII CONFIG ENV: getty path checks " + str(time.time() - start)
     elif not os.path.exists(villa_path):
         raise EnvironmentError("could not find villa-x.x.jar in script dir " + this_script_dir)
     elif not os.path.exists(junit_path):
@@ -86,12 +86,12 @@ def config_env():
     tools_path = this_script_dir + "lib/tools.jar"
     # print "CSII CONFIG ENV: get numerous paths " + str(time.time() - start)
 
-    start = time.time()
+    # start = time.time()
     if os.path.exists(hamcrest_path) and os.path.exists(getopt_path) and os.path.exists(plume_path) and \
             os.path.exists(daikon_path) and \
             os.path.exists(rt_path) and os.path.exists(jce_path) and os.path.exists(tools_path):
         print "\nSystem classpath is complete"
-        print "CSII CONFIG ENV: check numerous paths " + str(time.time() - start)
+        # print "CSII CONFIG ENV: check numerous paths " + str(time.time() - start)
     else:
         raise EnvironmentError(
             "\nSystem classpath is NOT complete. Check for hamcrest, getopt, plume, daikon, rt, jce, and tools.jar")

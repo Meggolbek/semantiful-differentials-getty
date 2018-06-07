@@ -872,7 +872,7 @@ def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, pre
     config.the_common_package.append(common_package)
     #print "center config.common package: " + str((time.time() - start))
     #     refined_target_set = old_refined_target_set | new_refined_target_set
-    start = time.time()
+    # start = time.time()
     refined_target_set, all_changed_methods, all_changed_tests = \
         _merge_target_sets(
             old_refined_target_set, new_refined_target_set, old_method_info_map, new_method_info_map), \
@@ -880,7 +880,7 @@ def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, pre
             old_changed_methods, new_changed_methods, old_method_info_map, new_method_info_map), \
         _merge_target_sets(
             old_changed_tests, new_changed_tests, old_method_info_map, new_method_info_map)
-    print "center merge targets: " + str((time.time() - start))
+    # print "center merge targets: " + str((time.time() - start))
 
     if json_filepath != "":
         test_selection = True
@@ -905,11 +905,11 @@ def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, pre
     common_expansion = set()
     refined_expansion_set = set()
     if config.class_level_expansion:
-        start = time.time()
+        # start = time.time()
         common_expansion = old_expansion & new_expansion
         refined_expansion_set = _common_specific_expansion(
             common_expansion, old_method_info_map, new_method_info_map)
-        print "center common specific expansion: " + str((time.time() - start))
+        # print "center common specific expansion: " + str((time.time() - start))
     #print "center get common expansion: " + str((time.time() - start))
     '''
         more passes: checkout mixed commits as detached head, and get invariants for all interesting targets
@@ -935,9 +935,9 @@ def visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, pre
     #start = time.time()
     all_classes_set = set(old_all_classes + new_all_classes)
     #print "center append set: " + str((time.time() - start))
-    start = time.time()
+    # start = time.time()
     all_classes_set = _append_class_ln(all_classes_set)
-    print "center append class ln: " + str((time.time() - start))
+    # print "center append class ln: " + str((time.time() - start))
 
     print 'Center analysis is completed.'
     return common_package, all_classes_set, refined_target_set, \
