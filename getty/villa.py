@@ -7,21 +7,17 @@ from tools import ex, git, os, maven_adapter
 def checkout_build(proj_dir, commit_hash):
     # os.sys_call("git checkout " + commit_hash)
     # os.sys_call("mvn clean")
-    bin_path = maven_adapter.get_bin_path(commit_hash)
-    src_rel_path = maven_adapter.get_source_directory(commit_hash)
+    bin_path, src_rel_path, test_src_rel_path = maven_adapter.prep_for_run_villa(commit_hash)
     if src_rel_path.startswith(proj_dir):
         src_rel_path = src_rel_path[len(proj_dir):]
     else:
         raise ValueError("proj_dir is not a prefix of src path")
     print "current src path (relative): " + src_rel_path + "\n"
-    test_src_rel_path = maven_adapter.get_test_source_directory(commit_hash)
     if test_src_rel_path.startswith(proj_dir):
         test_src_rel_path = test_src_rel_path[len(proj_dir):]
     else:
         raise ValueError("proj_dir is not a prefix of test src path")
     print "current test src path (relative): " + test_src_rel_path + "\n"
-
-    maven_adapter.compile_tests(commit_hash)
     return bin_path, src_rel_path, test_src_rel_path
 
 

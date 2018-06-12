@@ -281,15 +281,13 @@ def one_info_pass(
     # os.sys_call("git checkout " + this_hash)
     # os.sys_call("mvn clean")
 
-    bin_path = maven_adapter.get_bin_path(this_hash)
-    test_bin_path = maven_adapter.get_test_bin_path(this_hash)
-    cp = maven_adapter.get_full_class_path(this_hash, junit_path, sys_classpath, bin_path, test_bin_path)
+    #test_bin_path = maven_adapter.get_test_bin_path(this_hash)
+    cp = maven_adapter.get_full_class_path(this_hash, junit_path, sys_classpath)
     if SHOW_DEBUG_INFO:
         print "\n===full classpath===\n" + cp + "\n"
 
     print "\ncopying all code to specific directory ...\n"
-    all_code_dirs = [maven_adapter.get_source_directory(this_hash),
-                     maven_adapter.get_test_source_directory(this_hash)]
+    all_code_dirs = maven_adapter.get_all_source_directories(this_hash)
     getty_code_store = go + '_getty_allcode_' + this_hash + '_/'
     print 'copy to ' + getty_code_store + '\n'
     makedirs(getty_code_store)
@@ -298,7 +296,7 @@ def one_info_pass(
     if config.use_special_junit_for_dyn:
         info_junit_path = os.rreplace(junit_path, config.default_junit_version, config.special_junit_version, 1)
         # infocp = mvn.full_classpath(info_junit_path, sys_classpath, bin_path, test_bin_path)
-        infocp = maven_adapter.get_full_class_path(this_hash, info_junit_path, sys_classpath, bin_path, test_bin_path)
+        infocp = maven_adapter.get_full_class_path(this_hash, info_junit_path, sys_classpath)
     else:
         infocp = cp
     java_cmd = " ".join(["java", "-cp", infocp,
@@ -676,7 +674,7 @@ def mixed_passes(go, prev_hash, post_hash, refined_expansion_set,
         impact_set = refined_target_set
     # checkout old commit, then checkout new tests
     os.sys_call("git checkout " + prev_hash)
-    new_test_path = maven_adapter.get_test_source_directory(prev_hash)
+    new_src_path, new_test_path = maven_adapter.get_all_source_directories(prev_hash)
     os.sys_call(" ".join(["git", "checkout", post_hash, new_test_path]))
 #     # may need to check whether it is compilable, return code?
 #     os.sys_call("mvn clean test-compile")
@@ -686,8 +684,6 @@ def mixed_passes(go, prev_hash, post_hash, refined_expansion_set,
     git.clear_temp_checkout(prev_hash)
     
     # checkout old commit, then checkout new src
-    os.sys_call("git checkout " + prev_hash)
-    new_src_path = maven_adapter.get_source_directory(prev_hash)
     os.sys_call(" ".join(["git", "checkout", post_hash, new_src_path]))
 #     # may need to check whether it is compilable, return code?
 #     os.sys_call("mvn clean test-compile")
