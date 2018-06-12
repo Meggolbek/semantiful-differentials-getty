@@ -36,13 +36,14 @@ def prep_for_run_villa(hash):
     return bin_path, src_rel_path, test_src_rel_path
 
 def compile_tests(hash):
-    git_adapter.checkout(hash)
-    maven_clean()
+    # git_adapter.checkout(hash)
+    # maven_clean()
     os.sys_call("mvn test-compile")
 
 def get_junit_torun(cust_mvn_repo, hash):
     git_adapter.checkout(hash)
     maven_clean()
+    compile_tests(hash)
     return mvn.junit_torun_str(cust_mvn_repo)
 
 def generate_test_report(go, hash):

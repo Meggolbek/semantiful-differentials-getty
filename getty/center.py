@@ -11,7 +11,7 @@ import os as py_os
 
 import agency
 import config
-from tools import daikon, ex, git, html, os, profiler, maven_adapter
+from tools import daikon, ex, git, html, os, profiler, maven_adapter, git_adapter
 
 
 SHOW_DEBUG_INFO = config.show_debug_info
@@ -278,8 +278,6 @@ def get_expansion_set(go):
 def one_info_pass(
         junit_path, sys_classpath, agent_path, cust_mvn_repo, dyng_go, go, this_hash, target_set,
         changed_methods, changed_tests, inner_dataflow_methods, outer_dataflow_methods, json_filepath):
-    # os.sys_call("git checkout " + this_hash)
-    # os.sys_call("mvn clean")
 
     #test_bin_path = maven_adapter.get_test_bin_path(this_hash)
     cp = maven_adapter.get_full_class_path(this_hash, junit_path, sys_classpath)
@@ -308,7 +306,6 @@ def one_info_pass(
                          ])
 
     # os.sys_call("mvn test -DskipTests", ignore_bad_exit=True)
-    maven_adapter.compile_tests(this_hash)
 
     junit_torun = maven_adapter.get_junit_torun(cust_mvn_repo, this_hash)
     if SHOW_DEBUG_INFO:
@@ -399,8 +396,10 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
     methods_to_check = set()
     for priority in priorities["priorityList"]:
         print "prioririty " + priority
-        target_set, test_set, methods_to_check = add_to_targetset(methods_to_check, methods_to_tests, priority, target_set, test_set, types_to_methods)
+        target_set, test_set, methods_to_check = add_to_targetset(methods_to_check, methods_to_tests, priority,
+                                                                  target_set, test_set, types_to_methods)
     seen_methods = set([])
+
     #(methods_to_check = target set 1st iteration)
     #for each method in target set check if it calls another method
     #if so add that method to methods to check and target set
@@ -417,7 +416,6 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
                         target_set, test_set, methods_to_check = add_to_targetset(methods_to_check, methods_to_tests,
                                                                                   callee_name,target_set, test_set,
                                                                                       types_to_methods)
-
             methods_to_check.remove(m)
     print "target setttt"
     print target_set
@@ -433,7 +431,7 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
     return junit_torun, target_set, test_set
 
 
-def add_to_targetset(methods_to_check, methods_to_tests, target, target_set, test_set, types_to_methods):
+def add_to_targetset(methods_to_check, methods_to_tests, target, target_set, test_set, types_to_methodss):
     s = target + "("
     method = ""
     # check to see if method is eventually called by a test
@@ -538,6 +536,7 @@ def create_methods_to_tests(fname, junit_torun):
                     methods_to_tests[callee].union(methods_to_tests[caller])
                 elif caller in methods_to_tests:
                     methods_to_tests[callee] = methods_to_tests[caller]
+
     return methods_to_tests, nonTestMethodCalls
 
 
@@ -545,7 +544,7 @@ def create_methods_to_tests(fname, junit_torun):
 def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, test_selection, analysis_only=False):
 
     if not analysis_only:
-        os.sys_call("git checkout " + this_hash)
+        git_adapter.checkout(this_hash)
 
     # maven_adapter.maven_clean()
 
@@ -561,7 +560,7 @@ def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, test_select
                          ])
 
     # os.sys_call("mvn test -DskipTests", ignore_bad_exit=True)
-    maven_adapter.compile_tests(this_hash)
+    # maven_adapter.compile_tests(this_hash)
 
     if SHOW_DEBUG_INFO:
         print "\n===junit torun===\n" + junit_torun + "\n"
@@ -673,7 +672,6 @@ def mixed_passes(go, prev_hash, post_hash, refined_expansion_set,
     else:
         impact_set = refined_target_set
     # checkout old commit, then checkout new tests
-    os.sys_call("git checkout " + prev_hash)
     new_src_path, new_test_path = maven_adapter.get_all_source_directories(prev_hash)
     os.sys_call(" ".join(["git", "checkout", post_hash, new_test_path]))
 #     # may need to check whether it is compilable, return code?

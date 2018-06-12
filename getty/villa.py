@@ -5,8 +5,6 @@ from tools import ex, git, os, maven_adapter
 
 
 def checkout_build(proj_dir, commit_hash):
-    # os.sys_call("git checkout " + commit_hash)
-    # os.sys_call("mvn clean")
     bin_path, src_rel_path, test_src_rel_path = maven_adapter.prep_for_run_villa(commit_hash)
     if src_rel_path.startswith(proj_dir):
         src_rel_path = src_rel_path[len(proj_dir):]
