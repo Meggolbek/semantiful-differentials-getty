@@ -3,6 +3,7 @@
 import os
 import re
 import sys
+import time
 from inspect import getsourcefile
 
 import agency
@@ -217,7 +218,6 @@ def set_args():
 
 
 if __name__ == "__main__":
-    
     ## env config
     villa_path, junit_path, sys_classpath, agent_path, \
         pwd, proj_dir, go, dyng_go, fe_path, cust_mvn_repo = config_env()
@@ -361,5 +361,4 @@ if __name__ == "__main__":
             all_changed_tests, old_changed_tests, new_changed_tests,
             old_test_set, new_test_set,
             prev_hash, post_hash, old_l2m, new_l2m, old_m2l, new_m2l)
-    
     print 'Quit Getty.'
