@@ -12,16 +12,8 @@ def checkout_build(commit_hash):
     src_rel_path = maven_adapter.get_source_directory(commit_hash)
     test_src_rel_path = maven_adapter.get_test_source_directory(commit_hash)
 
-    # if src_rel_path.startswith(proj_dir):
-    #     src_rel_path = src_rel_path[len(proj_dir):]
-    # else:
-    #     raise ValueError("proj_dir is not a prefix of src path")
-    print "current src path (relative): " + src_rel_path + "\n"
-    # if test_src_rel_path.startswith(proj_dir):
-    #     test_src_rel_path = test_src_rel_path[len(proj_dir):]
-    # else:
-    #     raise ValueError("proj_dir is not a prefix of test src path")
-    print "current test src path (relative): " + test_src_rel_path + "\n"
+    # print "current src path (relative): " + src_rel_path + "\n"
+    # print "current test src path (relative): " + test_src_rel_path + "\n"
 
     maven_adapter.compile_tests(commit_hash)
 
@@ -35,7 +27,7 @@ def visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash, pkg_prefix="-"):
     print("        Getty Villa: Semantiful Differential Analyzer             ");
     print("****************************************************************\n");
     
-    print "current working directory: " + pwd + "\n"
+    # print "current working directory: " + pwd + "\n"
     
     diff_out = go + "text.diff"
     os.sys_call(" ".join(["git diff",
@@ -51,7 +43,7 @@ def visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash, pkg_prefix="-"):
         villa_path, diff_out, bin_path, test_src_rel_path, pkg_prefix, prev_hash, post_hash, go)
     run_villa_l4ms = "java -jar {0} -l {1} {2} {3} -o {4}".format(
         villa_path, src_rel_path, test_src_rel_path, prev_hash, go)
-    print "\n\nstart to run Villa ... \n\n" + run_villa + "\n  and  \n" + run_villa_l4ms
+    # print "\n\nstart to run Villa ... \n\n" + run_villa + "\n  and  \n" + run_villa_l4ms
     chdir(proj_dir)
     os.sys_call(run_villa)
     os.sys_call(run_villa_l4ms)
@@ -81,7 +73,7 @@ def visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash, pkg_prefix="-"):
         villa_path, diff_out, bin_path, test_src_rel_path, pkg_prefix, prev_hash, post_hash, go)
     run_villa_l4ms = "java -jar {0} -l {1} {2} {3} -o {4}".format(
         villa_path, src_rel_path, test_src_rel_path, post_hash, go)
-    print "\n\nstart to run Villa ... \n\n" + run_villa + "\n  and  \n" + run_villa_l4ms
+    # print "\n\nstart to run Villa ... \n\n" + run_villa + "\n  and  \n" + run_villa_l4ms
     chdir(proj_dir)
     os.sys_call(run_villa)
     os.sys_call(run_villa_l4ms)
@@ -122,7 +114,7 @@ def visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash, pkg_prefix="-"):
     
     run_villa = "java -jar {0} -r {1} {2} {3} {4} {5} {6} -o {7}".format(
         villa_path, diff_out, bin_path, test_src_rel_path, pkg_prefix, prev_hash, post_hash, go)
-    print "\n\nstart to run Villa ... \n\n" + run_villa
+    # print "\n\nstart to run Villa ... \n\n" + run_villa
     chdir(proj_dir)
     os.sys_call(run_villa)
     chdir(pwd)

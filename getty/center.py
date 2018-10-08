@@ -133,7 +133,7 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
                   "--ppt-select-pattern=\""+select_pattern+"\"",
                   junit_torun])
     if SHOW_DEBUG_INFO:
-        print "\n=== Daikon:Chicory+Daikon(online) command to run: \n" + run_chicory_daikon
+        # print "\n=== Daikon:Chicory+Daikon(online) command to run: \n" + run_chicory_daikon
     os.sys_call(run_chicory_daikon, ignore_bad_exit=True, cwd=ProjectUtils.get_version_path(this_hash))
     
     expansion = set()
@@ -158,7 +158,7 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
 
     print "==== classes to consider: ", classes_to_consider, " hash: " + this_hash
     for tgt in classes_to_consider:
-        print "============ target is: " + tgt + ", pattern is: "+ daikon.dpformat_with_sigs(tgt) +" ==============="
+        # print "============ target is: " + tgt + ", pattern is: "+ daikon.dpformat_with_sigs(tgt) +" ==============="
         target_ff = daikon.fsformat_with_sigs(tgt)
         out_file = go+"_getty_inv__"+target_ff+"__"+this_hash+"_.inv.out"
 
@@ -286,7 +286,7 @@ def one_info_pass(
     if SHOW_DEBUG_INFO:
         print "\n===full classpath===\n" + cp + "\n"
 
-    print "\ncopying all code to specific directory ...\n"
+    # print "\ncopying all code to specific directory ...\n"
     all_code_dirs = [maven_adapter.get_source_directory(this_hash),
                      maven_adapter.get_test_source_directory(this_hash)]
     getty_code_store = go + '_getty_allcode_' + this_hash + '_/'
@@ -339,7 +339,7 @@ def one_info_pass(
                 k, v = rawdata.split(" : ")
                 full_method_info_map[k.strip()] = v.strip()
 
-    print "dyng_go=", dyng_go, " go=", go
+    # print "dyng_go=", dyng_go, " go=", go
 
     os.merge_dyn_files(dyng_go, go, "_getty_dyncg_-hash-_.ex", this_hash)
     os.merge_dyn_files(dyng_go, go, "_getty_dynfg_-hash-_.ex", this_hash)
@@ -416,8 +416,6 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
                                                                                       types_to_methods)
 
             methods_to_check.remove(m)
-    print "target setttt"
-    print target_set
     #add each corresponding junit suite to junit to run
     tests_for_junit = set()
     for test in test_set:

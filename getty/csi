@@ -219,6 +219,7 @@ def set_args():
 
 
 if __name__ == "__main__":
+    start = time.time()
     ## env config
     villa_path, junit_path, sys_classpath, agent_path, \
         pwd, proj_dir, go, dyng_go, fe_path, cust_mvn_repo = config_env()
@@ -250,6 +251,8 @@ if __name__ == "__main__":
     '''
         multi-stage analysis: Villa (code) and Center (invariants) 
     '''
+    print "Time for set up: ", (time.time() - start)
+    start_villa = time.time()
     if config.profile_performance:
         profiler.run_and_report(
             "old_changed_methods, old_improved_changed_methods, old_added_changed_methods, \
@@ -274,7 +277,8 @@ if __name__ == "__main__":
             new_l2m, new_m2l, \
             old_changed_tests, new_changed_tests = \
                 villa.visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash)
-
+    print "time for villa.visit: ", (time.time() - start_villa)
+    start_agency = time.time()
 #     # DEBUG ONLY
 #     print "Debug info: "
 #     print old_changed_methods
@@ -284,14 +288,14 @@ if __name__ == "__main__":
     
     targets = agency.investigate(old_all_methods, new_all_methods)
     # up to this point, "allmtd"'s still contain the methods without parameters and line numbers, but all others do
-    
+    print "time for agency.investigate: ", (time.time() - start_agency)
     common_package = ''
     all_classes_set = set()
     old_test_set = set()
     old_refined_target_set = set()
     new_test_set = set()
     new_refined_target_set = set()
-    
+    start_center = time.time()
     if config.profile_performance:
         profiler.run_and_report(
             "common_package, all_classes_set, all_refined_target_set, old_test_set, old_refined_target_set, new_test_set, new_refined_target_set, \
@@ -306,12 +310,13 @@ if __name__ == "__main__":
             center.visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, prev_hash, post_hash, targets, iso,
                          old_improved_changed_methods, old_changed_tests, old_inner_dataflow_methods, old_outer_dataflow_methods, 
                          new_improved_changed_methods, new_changed_tests, new_inner_dataflow_methods, new_outer_dataflow_methods, json_filepath)
-    
+    print "time for center.visit: ", (time.time() - start_agency)
+    start_agency_caller_and_pred = time.time()
     old_caller_of, old_callee_of = agency.caller_callee(go, prev_hash)
     old_pred_of, old_succ_of = agency.pred_succ(go, prev_hash)
     new_caller_of, new_callee_of = agency.caller_callee(go, post_hash)
     new_pred_of, new_succ_of = agency.pred_succ(go, post_hash)
-    
+    print "time for agency.caller_callee x 2 and agency.pred_succ x 2: ", (time.time() - start_agency_caller_and_pred)
 #     # DEBUG ONLY
 #     print "Debug info: "
 #     print old_caller_of
@@ -334,8 +339,9 @@ if __name__ == "__main__":
     '''
         before last: restore original branch and all its pending work
     '''
+    start_git_pop = time.time()
     restore_and_pop_last(working_branch, should_further_recover)
-    
+    print "time for git restore and pop: ", (time.time() - start_git_pop)
     '''
         optional: csi view results
     '''
@@ -353,6 +359,7 @@ if __name__ == "__main__":
                  prev_hash, post_hash, old_l2m, new_l2m, old_m2l, new_m2l)",
             go + "_getty_x_profile_gallery.profile")
     elif json_filepath == "":
+        start_gallery = time.time()
         gallery.exam(
             iso, pwd, go, fe_path, common_package, all_classes_set,
             targets, all_refined_target_set,
@@ -364,4 +371,6 @@ if __name__ == "__main__":
             all_changed_tests, old_changed_tests, new_changed_tests,
             old_test_set, new_test_set,
             prev_hash, post_hash, old_l2m, new_l2m, old_m2l, new_m2l)
+        print "time for gallery: ", (time.time() - start_gallery)
+    print "total time: ", (time.time() - start)
     print 'Quit Getty.'
