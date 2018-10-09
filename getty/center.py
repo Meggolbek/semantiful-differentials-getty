@@ -133,7 +133,7 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
                   "--ppt-select-pattern=\""+select_pattern+"\"",
                   junit_torun])
     if SHOW_DEBUG_INFO:
-        # print "\n=== Daikon:Chicory+Daikon(online) command to run: \n" + run_chicory_daikon
+        print "\n=== Daikon:Chicory+Daikon(online) command to run: \n" + run_chicory_daikon
     os.sys_call(run_chicory_daikon, ignore_bad_exit=True, cwd=ProjectUtils.get_version_path(this_hash))
     
     expansion = set()
