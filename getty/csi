@@ -251,7 +251,7 @@ if __name__ == "__main__":
     '''
         multi-stage analysis: Villa (code) and Center (invariants) 
     '''
-    print "Time for set up: ", (time.time() - start)
+    set_up_time = time.time() - start
     start_villa = time.time()
     if config.profile_performance:
         profiler.run_and_report(
@@ -277,7 +277,7 @@ if __name__ == "__main__":
             new_l2m, new_m2l, \
             old_changed_tests, new_changed_tests = \
                 villa.visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash)
-    print "time for villa.visit: ", (time.time() - start_villa)
+    villa_time = time.time() - start_villa
     start_agency = time.time()
 #     # DEBUG ONLY
 #     print "Debug info: "
@@ -288,7 +288,7 @@ if __name__ == "__main__":
     
     targets = agency.investigate(old_all_methods, new_all_methods)
     # up to this point, "allmtd"'s still contain the methods without parameters and line numbers, but all others do
-    print "time for agency.investigate: ", (time.time() - start_agency)
+    agency_invesitgate_time = time.time() - start_agency
     common_package = ''
     all_classes_set = set()
     old_test_set = set()
@@ -310,13 +310,13 @@ if __name__ == "__main__":
             center.visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, prev_hash, post_hash, targets, iso,
                          old_improved_changed_methods, old_changed_tests, old_inner_dataflow_methods, old_outer_dataflow_methods, 
                          new_improved_changed_methods, new_changed_tests, new_inner_dataflow_methods, new_outer_dataflow_methods, json_filepath)
-    print "time for center.visit: ", (time.time() - start_agency)
+    center_time = time.time() - start_center
     start_agency_caller_and_pred = time.time()
     old_caller_of, old_callee_of = agency.caller_callee(go, prev_hash)
     old_pred_of, old_succ_of = agency.pred_succ(go, prev_hash)
     new_caller_of, new_callee_of = agency.caller_callee(go, post_hash)
     new_pred_of, new_succ_of = agency.pred_succ(go, post_hash)
-    print "time for agency.caller_callee x 2 and agency.pred_succ x 2: ", (time.time() - start_agency_caller_and_pred)
+    agency_cp_time = time.time() - start_agency_caller_and_pred
 #     # DEBUG ONLY
 #     print "Debug info: "
 #     print old_caller_of
@@ -373,4 +373,9 @@ if __name__ == "__main__":
             prev_hash, post_hash, old_l2m, new_l2m, old_m2l, new_m2l)
         print "time for gallery: ", (time.time() - start_gallery)
     print "total time: ", (time.time() - start)
+    print "set_up time: ", set_up_time
+    print "villa visit time: ", villa_time
+    print "agency investigate time: ", agency_invesitgate_time
+    print "center visit time: ", center_time
+    print "time for agency.caller_callee x 2 and agency.pred_succ x 2: ", agency_cp_time
     print 'Quit Getty.'
