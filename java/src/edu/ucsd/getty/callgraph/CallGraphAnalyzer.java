@@ -103,7 +103,7 @@ public class CallGraphAnalyzer {
 			// fourth pass grab dependencies
 			for (String classname : allclassnames) {
 				ClassInfo classinfo = classInfoTable.get(classname);
-				System.out.println();
+//				System.out.println();
 				if (!(this.classDependencies.containsKey(classname))) {
 					Set<String> temp = new HashSet<String>();
 					this.classDependencies.put(classname, temp);

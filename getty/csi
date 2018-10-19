@@ -46,10 +46,10 @@ def show_help():
 
 def config_env():
     # Villa's jar path
-    this_script_path = os.path.abspath(getsourcefile(lambda:0))
+    this_script_path = os.path.abspath(getsourcefile(lambda: 0))
     if this_script_path[-1] == "/":
         this_script_path = this_script_path[:-1]
-    this_script_dir = this_script_path[:this_script_path.rfind("/")+1]
+    this_script_dir = this_script_path[:this_script_path.rfind("/") + 1]
     villa_path = this_script_dir + "lib/villa-2.0.jar"  # jar is at the same dir
     junit_path = this_script_dir + "lib/junit-" + config.default_junit_version + ".jar"  # jar (junit) is at the same dir
     agent_path = this_script_dir + "lib/jdyncg-0.6-getty-dycg-agent.jar"  # jar is at the same dir
@@ -63,7 +63,7 @@ def config_env():
         raise EnvironmentError("could not find junit-x.jar (for getty) in script dir " + this_script_dir)
     elif not os.path.exists(agent_path):
         raise EnvironmentError("could not find jdyncg-0.x-getty-dycg-agent.jar in script dir " + this_script_dir)
-    
+
     # System classpath
     hamcrest_path = this_script_dir + "lib/hamcrest-all-1.3.jar"
     getopt_path = this_script_dir + "lib/java-getopt.jar"
@@ -73,19 +73,19 @@ def config_env():
     jce_path = this_script_dir + "lib/jce.jar"
     tools_path = this_script_dir + "lib/tools.jar"
     if os.path.exists(hamcrest_path) and os.path.exists(getopt_path) and os.path.exists(plume_path) and \
-        os.path.exists(daikon_path) and \
-        os.path.exists(rt_path) and os.path.exists(jce_path) and os.path.exists(tools_path):
+            os.path.exists(daikon_path) and \
+            os.path.exists(rt_path) and os.path.exists(jce_path) and os.path.exists(tools_path):
         print "\nSystem classpath is complete"
     else:
         raise EnvironmentError(
-                "\nSystem classpath is NOT complete. Check for hamcrest, getopt, plume, daikon, rt, jce, and tools.jar")
+            "\nSystem classpath is NOT complete. Check for hamcrest, getopt, plume, daikon, rt, jce, and tools.jar")
     sys_classpath = ":".join([hamcrest_path, getopt_path, plume_path, daikon_path, rt_path, jce_path, tools_path])
-    
+
     # present working directory - it should be the project's root with "/" at the end
     pwd = cwd()
     if pwd[-1] != "/":
         pwd += "/"
-    
+
     proj_dir = pwd
     dyng_go = pwd[:-1] + ".__getty_output__/"
     # getty output directory - /tmp/__getty_output__/ or ../projectname__getty_output__/
@@ -100,25 +100,25 @@ def config_env():
             if last_slash <= 0:
                 raise EnvironmentError("project setting is problematic")
             else:
-                middle_path = "." + curr_dir[last_slash+1:-1] + middle_path
-                curr_dir = curr_dir[:last_slash+1]
+                middle_path = "." + curr_dir[last_slash + 1:-1] + middle_path
+                curr_dir = curr_dir[:last_slash + 1]
         proj_dir = curr_dir
         go = curr_dir[:-1] + middle_path + ".__getty_output__/"
-        
+
     if os.path.exists(go):
         if not os.path.isdir(go):
             raise EnvironmentError(go + " already exists but is not a directory")
     else:
         os.makedirs(go)
-    
+
     # javascript path
     fe_path = this_script_dir + "frontend/"
-    
+
     # FIXME: better copy to and use go folder
     cust_mvn_repo = this_script_dir + "lib/repository"
-    
+
     return villa_path, junit_path, sys_classpath, agent_path, \
-        pwd, proj_dir, go, dyng_go, fe_path, cust_mvn_repo
+           pwd, proj_dir, go, dyng_go, fe_path, cust_mvn_repo
 
 
 def set_args():
@@ -214,7 +214,7 @@ def set_args():
     else:
         raise ValueError("number of arguments should be 0~3")
     # consider using `git rev-parse --short HEAD` if shorter names are preferred
-    
+
     return prev_hash, post_hash, go_postfix, isolation, json_filepath
 
 
@@ -222,11 +222,11 @@ if __name__ == "__main__":
     start = time.time()
     ## env config
     villa_path, junit_path, sys_classpath, agent_path, \
-        pwd, proj_dir, go, dyng_go, fe_path, cust_mvn_repo = config_env()
-    
+    pwd, proj_dir, go, dyng_go, fe_path, cust_mvn_repo = config_env()
+
     ## args checking & setting
     prev_hash, post_hash, go_postfix, iso, json_filepath = set_args()
-    
+
     ## set new go folder if needed; keep old go folder for dynamic graph output
     go += go_postfix
     if go_postfix != "":
@@ -238,7 +238,7 @@ if __name__ == "__main__":
     separate_go = (dyng_go, go)
 
     ProjectUtils.init(proj_dir, go)
-    
+
     '''
         0-th: backup current branch work in stash for the last pass to restore
     '''
@@ -256,36 +256,28 @@ if __name__ == "__main__":
     if config.profile_performance:
         profiler.run_and_report(
             "old_changed_methods, old_improved_changed_methods, old_added_changed_methods, \
-             old_all_methods, \
-             old_inner_dataflow_methods, old_outer_dataflow_methods, \
-             old_l2m, old_m2l, \
+             old_all_methods, old_l2m, old_m2l, \
              new_changed_methods, new_improved_changed_methods, new_removed_changed_methods, \
-             new_all_methods, \
-             new_inner_dataflow_methods, new_outer_dataflow_methods, \
-             new_l2m, new_m2l, \
+             new_all_methods, new_l2m, new_m2l, \
              old_changed_tests, new_changed_tests = \
                  villa.visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash)",
             go + "_getty_x_profile_villa.profile")
     else:
         old_changed_methods, old_improved_changed_methods, old_added_changed_methods, \
-            old_all_methods, \
-            old_inner_dataflow_methods, old_outer_dataflow_methods, \
-            old_l2m, old_m2l, \
-            new_changed_methods, new_improved_changed_methods, new_removed_changed_methods, \
-            new_all_methods, \
-            new_inner_dataflow_methods, new_outer_dataflow_methods, \
-            new_l2m, new_m2l, \
-            old_changed_tests, new_changed_tests = \
-                villa.visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash)
+        old_all_methods, old_l2m, old_m2l, \
+        new_changed_methods, new_improved_changed_methods, new_removed_changed_methods, \
+        new_all_methods, new_l2m, new_m2l, \
+        old_changed_tests, new_changed_tests = \
+            villa.visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash)
     villa_time = time.time() - start_villa
     start_agency = time.time()
-#     # DEBUG ONLY
-#     print "Debug info: "
-#     print old_changed_methods
-#     print new_changed_methods
-#     print new_improved_changed_methods
-#     print new_removed_changed_methods
-    
+    #     # DEBUG ONLY
+    #     print "Debug info: "
+    #     print old_changed_methods
+    #     print new_changed_methods
+    #     print new_improved_changed_methods
+    #     print new_removed_changed_methods
+
     targets = agency.investigate(old_all_methods, new_all_methods)
     # up to this point, "allmtd"'s still contain the methods without parameters and line numbers, but all others do
     agency_invesitgate_time = time.time() - start_agency
@@ -301,41 +293,23 @@ if __name__ == "__main__":
             "common_package, all_classes_set, all_refined_target_set, old_test_set, old_refined_target_set, new_test_set, new_refined_target_set, \
                  old_changed_methods, new_changed_methods, old_changed_tests, new_changed_tests, all_changed_methods, all_changed_tests = \
                  center.visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, prev_hash, post_hash, targets, iso, \
-                 old_improved_changed_methods, old_changed_tests, old_inner_dataflow_methods, old_outer_dataflow_methods, \
-                 new_improved_changed_methods, new_changed_tests, new_inner_dataflow_methods, new_outer_dataflow_methods, json_filepath)",
+                 old_improved_changed_methods, old_changed_tests, \
+                 new_improved_changed_methods, new_changed_tests, json_filepath)",
             go + "_getty_x_profile_center.profile")
     else:
+        # Most of these returned values are not needed if using plugin
         common_package, all_classes_set, all_refined_target_set, old_test_set, old_refined_target_set, new_test_set, new_refined_target_set, \
-            old_changed_methods, new_changed_methods, old_changed_tests, new_changed_tests, all_changed_methods, all_changed_tests = \
-            center.visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, prev_hash, post_hash, targets, iso,
-                         old_improved_changed_methods, old_changed_tests, old_inner_dataflow_methods, old_outer_dataflow_methods, 
-                         new_improved_changed_methods, new_changed_tests, new_inner_dataflow_methods, new_outer_dataflow_methods, json_filepath)
+        old_changed_methods, new_changed_methods, old_changed_tests, new_changed_tests, all_changed_methods, all_changed_tests = \
+            center.visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, prev_hash, post_hash,
+                         targets, iso, old_improved_changed_methods, old_changed_tests,
+                         new_improved_changed_methods, new_changed_tests, json_filepath)
     center_time = time.time() - start_center
-    start_agency_caller_and_pred = time.time()
-    old_caller_of, old_callee_of = agency.caller_callee(go, prev_hash)
-    old_pred_of, old_succ_of = agency.pred_succ(go, prev_hash)
-    new_caller_of, new_callee_of = agency.caller_callee(go, post_hash)
-    new_pred_of, new_succ_of = agency.pred_succ(go, post_hash)
-    agency_cp_time = time.time() - start_agency_caller_and_pred
-#     # DEBUG ONLY
-#     print "Debug info: "
-#     print old_caller_of
-#     print old_callee_of
-#     print old_pred_of
-#     print old_succ_of
-#     print new_caller_of
-#     print new_callee_of
-#     print new_pred_of
-#     print new_succ_of
-    
-#     # DEBUG ONLY
-#     for aset in [old_changed_methods, new_changed_methods, 
-#                  old_changed_tests, new_changed_tests,
-#                  old_refined_target_set, new_refined_target_set,
-#                  all_refined_target_set]:
-#         print aset
-#         print ""
-
+    if json_filepath == "" or config.profile_performance:
+        # only used for gallery, which is not run if we have a priority json file
+        old_caller_of, old_callee_of = agency.caller_callee(go, prev_hash)
+        old_pred_of, old_succ_of = agency.pred_succ(go, prev_hash)
+        new_caller_of, new_callee_of = agency.caller_callee(go, post_hash)
+        new_pred_of, new_succ_of = agency.pred_succ(go, post_hash)
     '''
         before last: restore original branch and all its pending work
     '''
@@ -377,5 +351,4 @@ if __name__ == "__main__":
     print "villa visit time: ", villa_time
     print "agency investigate time: ", agency_invesitgate_time
     print "center visit time: ", center_time
-    print "time for agency.caller_callee x 2 and agency.pred_succ x 2: ", agency_cp_time
     print 'Quit Getty.'

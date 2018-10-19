@@ -265,14 +265,7 @@ public class Villa {
 					"<simple mode>: number of changed tests (inaccurate): " + revised_tests.size() + "\n"
 							+ "  output to file --> " + chgtests_out_path + " ...\n");
 			output_to(chgtests_out_path, revised_tests);
-			
-			
-			////
-			// get clr only if it is not bare mode
-			////
-			if (!(args[0].equals("-s") || args[0].equals("--simgen=bare"))) {
-				output_dataflow_approx(output_dir, chain_generator, this_commit);
-			}
+
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -337,7 +330,6 @@ public class Villa {
 						out.println(key + "," + method);
 					}
 				}
-				//more code
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.exit(22);
@@ -394,10 +386,6 @@ public class Villa {
 					"<complex mode>: number of changed tests (inaccurate): " + revised_tests.size() + "\n"
 							+ "  output to file --> " + chgtests_out_path + " ...\n");
 			output_to(chgtests_out_path, revised_tests);
-			
-			/************************************************/
-			ITraceFinder chain_generator_improved = (ITraceFinder) get_generator(target_path, package_prefix, revised_methods);
-			output_dataflow_approx(output_dir, chain_generator_improved, curr_commit);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -454,9 +442,6 @@ public class Villa {
 					"<recovery mode>: IMPROVED, number of added methods: " + added_methods.size() + "\n"
 							+ "  output to file --> " + added_chgmtd_out_path + " ...\n");
 			output_to(added_chgmtd_out_path, added_methods);
-
-			ITraceFinder chain_generator_improved = (ITraceFinder) get_generator(target_path, package_prefix, revised_methods);
-			output_dataflow_approx(output_dir, chain_generator_improved, prev_commit);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -499,59 +484,6 @@ public class Villa {
 			e.printStackTrace();
 			System.exit(2);
 		}
-	}
-	
-	private static void output_dataflow_approx(String output_dir, ITraceFinder generator, String commit_hash) {
-		try {
-			// output inner flow candidates
-			Map<String, Set<String>> inner_streams = generator.possibleInnerStreams();
-			String is_str = "{";
-			for (String method : inner_streams.keySet()) {
-				is_str += ("\"" + method + "\": [");
-				for (String inner_callee : inner_streams.get(method)) {
-					is_str += ("\"" + inner_callee + "\", ");
-				}
-				is_str += "], ";
-			}
-			is_str += "}";
-			String is_out_path = output_dir + "_getty_dfinner_" + commit_hash + "_.ex";
-			System.out.println(
-					"<dataflow approximate>: number of project methods considered for inner flows: " + inner_streams.size() + "\n"
-							+ "  output to file --> " + is_out_path + " ...\n");
-			PrintWriter is_out = new PrintWriter(
-					new BufferedWriter(new FileWriter(is_out_path, false)));
-			is_out.print(is_str);
-			is_out.close();
-			
-			// output outer flow candidates
-			Map<String, Map<String, Set<String>>> outer_streams = generator.possibleOuterStreams();
-			String os_str = "{";
-			for (String method : outer_streams.keySet()) {
-				os_str += ("\"" + method + "\": {");
-				Map<String, Set<String>> caller_callees = outer_streams.get(method);
-				for (String caller : caller_callees.keySet()) {
-					os_str += ("\"" + caller + "\": [");
-					for (String other_callee : caller_callees.get(caller))
-						os_str += ("\"" + other_callee + "\", ");
-					os_str += "], ";
-				}
-				os_str += "}, ";
-			}
-			os_str += "}";
-			String os_out_path = output_dir + "_getty_dfouter_" + commit_hash + "_.ex";
-			System.out.println(
-					"<dataflow approximate>: number of project methods considered for outer flows: " + outer_streams.size() + "\n"
-							+ "  output to file --> " + os_out_path + " ...\n");
-			PrintWriter os_out = new PrintWriter(
-					new BufferedWriter(new FileWriter(os_out_path, false)));
-			os_out.print(os_str);
-			os_out.close();
-			
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-			System.exit(2);
-		}
-		
 	}
 	
 	private static void output_to(String out_path, Set<String> set_content) throws IOException {

@@ -1,5 +1,4 @@
 # get interested runtime targets
-
 import re
 from copy import deepcopy
 
@@ -75,7 +74,7 @@ def _correct_offset(rough_targets, exact_target_map):
     for t in rough_targets:
         dash_index = t.rfind("-")
         if dash_index != -1:
-            line_number = int(t[dash_index+1:].strip())
+            line_number = int(t[dash_index + 1:].strip())
             for offset in range(sigspan):
                 consider = t[:dash_index] + "-" + str(line_number + offset)
                 if consider in potential_target_keys:
@@ -86,7 +85,7 @@ def _correct_offset(rough_targets, exact_target_map):
             else:
                 print 'RARE: no method name matches in the given offset'
                 for anyone in potential_target_keys:
-                    if anyone.startswith(t[:dash_index+1]):
+                    if anyone.startswith(t[:dash_index + 1]):
                         result.add(anyone)
                         break
                 if size_tracked < len(result):
@@ -103,12 +102,11 @@ def _correct_offset(rough_targets, exact_target_map):
 
 def refine_targets(full_method_info_map, target_sett, test_set,
                    caller_of, callee_of, pred_of, succ_of,
-                   changed_methods, changed_tests,
-                   inner_dataflow_methods, outer_dataflow_methods, json_filepath):
+                   changed_methods, changed_tests, json_filepath):
     target_set = set([])
     if json_filepath != "":
         for ky in full_method_info_map.keys():
-             if ky in target_sett:
+            if ky in target_sett:
                 target_set.add(full_method_info_map[ky])
     else:
         for ky in full_method_info_map.keys():
@@ -121,7 +119,7 @@ def refine_targets(full_method_info_map, target_sett, test_set,
     for cm in cmbak:
         if cm in full_method_info_map:
             changed_methods.add(full_method_info_map[cm])
-    
+
     ctbak = _correct_offset(changed_tests, full_method_info_map)
     changed_tests = set([])
     for ct in ctbak:
@@ -146,5 +144,5 @@ def refine_targets(full_method_info_map, target_sett, test_set,
             all_for_current = all_neighbors - all_related
         all_related = all_related | all_for_current
         refined_target_set = refined_target_set & all_related
-    
+
     return refined_target_set, changed_methods, changed_tests

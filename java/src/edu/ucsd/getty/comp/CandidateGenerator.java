@@ -44,17 +44,7 @@ public class CandidateGenerator implements ITraceFinder {
 	public Set<String> getAllProjectMethods() {
 		return this.allProjectMethods;
 	}
-	
-//	private Set<String> reformat(Set<String> methodnames) {
-//		Set<String> reformatted = new HashSet<String>();
-//		for (String methodname : methodnames)
-//			reformatted.add(NameHandler.internalToQualifiedName(methodname));
-//		return reformatted;
-//	}
-//	
-//	public Set<String> getReformattedCallersFor(String methodName) {
-//		return reformat(getCallersFor(methodName));
-//	}
+
 
 	@Override
 	public Set<String> getCallersFor(String methodName) {
