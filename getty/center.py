@@ -125,7 +125,7 @@ def seq_get_invs(target_set_index_pair, java_cmd, junit_torun, go, this_hash, co
     daikon_display_args = " ".join(daikon_control_opt_list)
     # run Chicory + Daikon (online) for invariants without trace I/O
     run_chicory_daikon = \
-        " ".join([java_cmd, "daikon.Chicory --daikon-online --exception-handling",
+        " ".join([java_cmd, "daikon.Chicory --daikon-online-fast --binary-trace",
                   "--daikon-args=\"" + daikon_display_args,
                   "-o", inv_gz + "\"",
                   "--ppt-select-pattern=\"" + select_pattern + "\"",
