@@ -125,24 +125,26 @@ def refine_targets(full_method_info_map, target_sett, test_set,
     for ct in ctbak:
         if ct in full_method_info_map:
             changed_tests.add(full_method_info_map[ct])
-
-    if config.analyze_tests:
-        refined_target_set = refined_target_set | test_set | changed_tests
-    if config.limit_interest:
-        # do not use static call graph information for now, but consider to use it for better results!
-        all_related = set()
-        all_for_current = changed_methods | changed_tests
-        for _ in range(config.limit_distance):
-            all_neighbors = set()
+    # below is only when we use getty the old way. We already add multiple layers of callers/callees to target set.
+    # below adds 3 up and 3 down for each method currently in target set
+    if json_filepath != "":
+        if config.analyze_tests:
+            refined_target_set = refined_target_set | test_set | changed_tests
+        if config.limit_interest:
+            # do not use static call graph information for now, but consider to use it for better results!
+            all_related = set()
+            all_for_current = changed_methods | changed_tests
+            for _ in range(config.limit_distance):
+                all_neighbors = set()
+                all_related = all_related | all_for_current
+                for tgt in all_for_current:
+                    if tgt not in test_set or not config.analyze_less_tests:
+                        all_neighbors |= _neighbor_for(tgt, pred_of)
+                        all_neighbors |= _neighbor_for(tgt, succ_of)
+                        all_neighbors |= _neighbor_for(tgt, caller_of)
+                    all_neighbors |= _neighbor_for(tgt, callee_of)
+                all_for_current = all_neighbors - all_related
             all_related = all_related | all_for_current
-            for tgt in all_for_current:
-                if tgt not in test_set or not config.analyze_less_tests:
-                    all_neighbors |= _neighbor_for(tgt, pred_of)
-                    all_neighbors |= _neighbor_for(tgt, succ_of)
-                    all_neighbors |= _neighbor_for(tgt, caller_of)
-                all_neighbors |= _neighbor_for(tgt, callee_of)
-            all_for_current = all_neighbors - all_related
-        all_related = all_related | all_for_current
-        refined_target_set = refined_target_set & all_related
+            refined_target_set = refined_target_set & all_related
 
     return refined_target_set, changed_methods, changed_tests
