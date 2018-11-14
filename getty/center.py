@@ -412,8 +412,6 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
                                                                                   types_to_methods)
 
             methods_to_check.remove(m)
-    print "target setttt"
-    print target_set
     # add each corresponding junit suite to junit to run
     tests_for_junit = set()
     for test in test_set:
