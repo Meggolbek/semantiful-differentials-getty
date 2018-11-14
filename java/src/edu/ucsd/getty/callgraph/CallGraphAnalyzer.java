@@ -108,14 +108,6 @@ public class CallGraphAnalyzer {
 					Set<String> temp = new HashSet<String>();
 					this.classDependencies.put(classname, temp);
 				}
-				//get all referenced classes into table
-				for (String rclass : classinfo.classReferences) {
-					//Filtering out external classes (libraries) because we assume they will not change.
-					// Otherwise we will have to potientially run every test.
-					if (allclassnames.contains(rclass)) {
-						this.classDependencies.get(classname).add(rclass);
-					}
-				}
 				//get all super classes and interfaces classinfo.supers have immediate parents and interfaces
 				for (String pclass : classinfo.supers) {
 					//Filtering out external classes (libraries) because we assume they will not change.
