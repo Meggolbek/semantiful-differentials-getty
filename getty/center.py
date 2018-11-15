@@ -4,6 +4,7 @@ import re
 import sys
 import time
 import json
+import copy
 from functools import partial
 from multiprocessing import Pool
 from os import path, makedirs
@@ -376,6 +377,7 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
     test_set = set()
     target_set = set()
     methods_to_check = set()
+    nontest_method_calls, methods_to_tests = refine_method_to_tests(priorities, nontest_method_calls, methods_to_tests)
     for priority in priorities["priorityList"]:
         package = priority.split(":")
         # check if package name is a test suite. if so then it is a test.
@@ -518,20 +520,60 @@ def create_methods_to_tests(fname, junit_torun):
         # if not a test then it is a method calling another method
         else:
             if invocation[0] in nonTestMethodCalls.keys():
-                for k in nonTestMethodCalls[invocation[0]]:
-                    if k in nonTestMethodCalls:
-                        nonTestMethodCalls[invocation[0]].union(nonTestMethodCalls[k])
+                nonTestMethodCalls[invocation[0]].add(invocation[1])
             else:
                 nonTestMethodCalls[invocation[0]] = set([invocation[1]])
-        # for each caller that calls another method call, add tests for caller to callee
-        for caller in nonTestMethodCalls:
-            for callee in nonTestMethodCalls[caller]:
-                if callee in methods_to_tests and caller in methods_to_tests:
-                    methods_to_tests[callee].union(methods_to_tests[caller])
-                elif caller in methods_to_tests:
-                    methods_to_tests[callee] = methods_to_tests[caller]
     return methods_to_tests, nonTestMethodCalls
 
+
+def refine_method_to_tests(priorities, nonTestMethodCalls, methods_to_tests):
+    # only do this for methods connected to priority methods
+    # get mapping from methods to methods that are called in that method
+    # example: a calls b and b calls c, a maps to b and c (goes all the way down to leaf nodes)
+    methodsToConsider = set(priorities)
+    mergeable = set()
+    methodCalls = copy.deepcopy(nonTestMethodCalls)
+    while methodsToConsider:
+        callers = methodsToConsider
+        nonMergeable = set()
+        for caller in callers:
+            mCalls = copy.deepcopy(methodCalls)
+            if caller in methodCalls:
+                for callee in methodCalls[caller]:
+                    if callee in mCalls.keys():
+                        if caller in mCalls[callee]:
+                            for callee2 in nonTestMethodCalls[callee]:
+                                if callee2 not in nonTestMethodCalls[caller] and caller != callee2:
+                                    mCalls[caller].add(callee2)
+                            nonTestMethodCalls[caller].update(nonTestMethodCalls[callee])
+                            nonTestMethodCalls[caller].remove(caller)
+                            mCalls[caller].remove(callee)
+                            for callee2 in nonTestMethodCalls[caller]:
+                                if callee2 not in nonTestMethodCalls[callee] and callee != callee2:
+                                    mCalls[callee].add(callee2)
+                            nonTestMethodCalls[callee].update(nonTestMethodCalls[caller])
+                            nonTestMethodCalls[callee].remove(callee)
+                            mCalls[callee].remove(caller)
+                        else:
+                            nonMergeable.add(caller)
+                            if callee not in methodsToConsider:
+                                nonMergeable.add(callee)
+                    if callee in mergeable:
+                        nonTestMethodCalls[caller].update(nonTestMethodCalls[callee])
+                        mCalls[caller].remove(callee)
+            methodCalls = mCalls
+            if caller not in nonMergeable and caller in nonTestMethodCalls.keys():
+                mergeable.add(caller)
+        methodsToConsider = nonMergeable
+    # update methods to tests with non test method calls
+    for method in methods_to_tests.keys():
+        if method in nonTestMethodCalls.keys():
+            for callee in nonTestMethodCalls[method]:
+                if callee in methods_to_tests.keys():
+                    methods_to_tests[callee].update(methods_to_tests[method])
+                else:
+                    methods_to_tests[callee] = methods_to_tests[method]
+    return nonTestMethodCalls, methods_to_tests
 
 # one pass template
 def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, test_selection, analysis_only=False):
