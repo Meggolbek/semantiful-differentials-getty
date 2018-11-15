@@ -4,6 +4,7 @@ import re
 import sys
 import time
 import json
+import copy
 from functools import partial
 from multiprocessing import Pool
 from os import path, makedirs
@@ -375,7 +376,7 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
         priorities = json.load(f)
     test_set = set()
     target_set = set()
-    methods_to_check = set()
+    nontest_method_calls, methods_to_tests = refine_method_to_tests(priorities, nontest_method_calls, methods_to_tests)
     for priority in priorities["priorityList"]:
         package = priority.split(":")
         # check if package name is a test suite. if so then it is a test.
@@ -386,34 +387,22 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
                 for test in methods_to_tests[method]:
                     if priority == test[:len(priority)]:
                         method = method[:method.find("(")]
-                        target_set, test_set, methods_to_check = add_to_targetset(methods_to_check, methods_to_tests,
-                                                                                  method, target_set, test_set,
+                        target_set, test_set= add_to_targetset(methods_to_tests, method, target_set, test_set,
                                                                                   types_to_methods)
         # else priority is not a test
         else:
-            target_set, test_set, methods_to_check = add_to_targetset(methods_to_check, methods_to_tests, priority,
-                                                                      target_set, test_set, types_to_methods)
-    seen_methods = set([])
-    # (methods_to_check = target set 1st iteration)
+            target_set, test_set= add_to_targetset(methods_to_tests, priority, target_set, test_set, types_to_methods)
     # for each method in target set check if it calls another method
     # if so add that method to methods to check and target set
-    # run until no more methods to check or all methods have been seen
-    while methods_to_check:
-        to_check = set(methods_to_check)
-        for m in to_check:
-            if not m in seen_methods:
-                seen_methods.add(m)
-                if m in nontest_method_calls.keys():
-                    for callee in nontest_method_calls[m]:
-                        methods_to_check.add(callee)
-                        callee_name = callee[:(callee.rfind("("))]
-                        target_set, test_set, methods_to_check = add_to_targetset(methods_to_check, methods_to_tests,
-                                                                                  callee_name, target_set, test_set,
-                                                                                  types_to_methods)
-
-            methods_to_check.remove(m)
-    print "target setttt"
-    print target_set
+    check_target_set = copy.deepcopy(target_set)
+    for target in check_target_set:
+        method_name = target.split("-")[0] + "("
+        for method in nontest_method_calls.keys():
+            if method[:len(method_name)] == method_name:
+                for callee in nontest_method_calls[method]:
+                    callee_name = callee[:(callee.rfind("("))]
+                    target_set, test_set = add_to_targetset(methods_to_tests, callee_name, target_set, test_set,
+                                                           types_to_methods)
     # add each corresponding junit suite to junit to run
     tests_for_junit = set()
     for test in test_set:
@@ -426,7 +415,7 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
     return junit_torun, target_set, test_set
 
 
-def add_to_targetset(methods_to_check, methods_to_tests, target, target_set, test_set, types_to_methods):
+def add_to_targetset(methods_to_tests, target, target_set, test_set, types_to_methods):
     s = target + "("
     method = ""
     # check to see if method is eventually called by a test
@@ -442,11 +431,6 @@ def add_to_targetset(methods_to_check, methods_to_tests, target, target_set, tes
         target_set.add(target + methodNumber)
         for test in methods_to_tests[method]:
             test_set.add(test)
-            # methodNumber = test[(test.rfind("-")):]
-            # target_set.add(target + methodNumber)
-            # methods_to_check.add(test)
-        # methods to check are for checking if there are called methods within target
-        methods_to_check.add(method)
     # else it must be a method that belongs to a type. Get methods that implement it
     # or are in a subclass of it
     else:
@@ -469,8 +453,7 @@ def add_to_targetset(methods_to_check, methods_to_tests, target, target_set, tes
                             target_set.add(m + methodNumber)
                             for test in methods_to_tests[key]:
                                 test_set.add(test)
-                            methods_to_check.add(key)
-    return target_set, test_set, methods_to_check
+    return target_set, test_set
 
 
 def read_in_types_to_methods(go, this_hash):
@@ -520,20 +503,60 @@ def create_methods_to_tests(fname, junit_torun):
         # if not a test then it is a method calling another method
         else:
             if invocation[0] in nonTestMethodCalls.keys():
-                for k in nonTestMethodCalls[invocation[0]]:
-                    if k in nonTestMethodCalls:
-                        nonTestMethodCalls[invocation[0]].union(nonTestMethodCalls[k])
+                nonTestMethodCalls[invocation[0]].add(invocation[1])
             else:
                 nonTestMethodCalls[invocation[0]] = set([invocation[1]])
-        # for each caller that calls another method call, add tests for caller to callee
-        for caller in nonTestMethodCalls:
-            for callee in nonTestMethodCalls[caller]:
-                if callee in methods_to_tests and caller in methods_to_tests:
-                    methods_to_tests[callee].union(methods_to_tests[caller])
-                elif caller in methods_to_tests:
-                    methods_to_tests[callee] = methods_to_tests[caller]
     return methods_to_tests, nonTestMethodCalls
 
+
+def refine_method_to_tests(priorities, nonTestMethodCalls, methods_to_tests):
+    # only do this for methods connected to priority methods
+    # get mapping from methods to methods that are called in that method
+    # example: a calls b and b calls c, a maps to b and c (goes all the way down to leaf nodes)
+    methodsToConsider = set(priorities)
+    mergeable = set()
+    methodCalls = copy.deepcopy(nonTestMethodCalls)
+    while methodsToConsider:
+        callers = methodsToConsider
+        nonMergeable = set()
+        for caller in callers:
+            mCalls = copy.deepcopy(methodCalls)
+            if caller in methodCalls:
+                for callee in methodCalls[caller]:
+                    if callee in mCalls.keys():
+                        if caller in mCalls[callee]:
+                            for callee2 in nonTestMethodCalls[callee]:
+                                if callee2 not in nonTestMethodCalls[caller] and caller != callee2:
+                                    mCalls[caller].add(callee2)
+                            nonTestMethodCalls[caller].update(nonTestMethodCalls[callee])
+                            nonTestMethodCalls[caller].remove(caller)
+                            mCalls[caller].remove(callee)
+                            for callee2 in nonTestMethodCalls[caller]:
+                                if callee2 not in nonTestMethodCalls[callee] and callee != callee2:
+                                    mCalls[callee].add(callee2)
+                            nonTestMethodCalls[callee].update(nonTestMethodCalls[caller])
+                            nonTestMethodCalls[callee].remove(callee)
+                            mCalls[callee].remove(caller)
+                        else:
+                            nonMergeable.add(caller)
+                            if callee not in methodsToConsider:
+                                nonMergeable.add(callee)
+                    if callee in mergeable:
+                        nonTestMethodCalls[caller].update(nonTestMethodCalls[callee])
+                        mCalls[caller].remove(callee)
+            methodCalls = mCalls
+            if caller not in nonMergeable and caller in nonTestMethodCalls.keys():
+                mergeable.add(caller)
+        methodsToConsider = nonMergeable
+    # update methods to tests with non test method calls
+    for method in methods_to_tests.keys():
+        if method in nonTestMethodCalls.keys():
+            for callee in nonTestMethodCalls[method]:
+                if callee in methods_to_tests.keys():
+                    methods_to_tests[callee].update(methods_to_tests[method])
+                else:
+                    methods_to_tests[callee] = methods_to_tests[method]
+    return nonTestMethodCalls, methods_to_tests
 
 # one pass template
 def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, test_selection, analysis_only=False):
