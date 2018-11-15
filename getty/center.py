@@ -287,7 +287,7 @@ def one_info_pass(
     all_code_dirs = [maven_adapter.get_source_directory(this_hash),
                      maven_adapter.get_test_source_directory(this_hash)]
     getty_code_store = go + '_getty_allcode_' + this_hash + '_/'
-    print 'copy to ' + getty_code_store + '\n'
+    # print 'copy to ' + getty_code_store + '\n'
     makedirs(getty_code_store)
     for adir in all_code_dirs:
         os.sys_call(" ".join(["cp -r", adir + "/*", getty_code_store]), ignore_bad_exit=True)

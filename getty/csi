@@ -13,8 +13,6 @@ import gallery
 import villa
 from tools.project_utils import ProjectUtils
 from tools import profiler
-from analysis.inspector import getty_csi_init, getty_csi_targets_prep
-from tools.hdiff import diff_to_html, getty_append_semainfo
 from tools.git import (
     backup_and_stash_first,
     get_current_head_branch,
@@ -22,9 +20,7 @@ from tools.git import (
     get_ancestor_hash,
     get_hash,
     get_remote_head,
-    restore_and_pop_last,
-    git_commit_msgs,
-    github_info
+    restore_and_pop_last
 )
 from tools.os import cwd, remove_many_files, remove_file
 
