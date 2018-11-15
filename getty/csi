@@ -215,7 +215,7 @@ def set_args():
 
 
 if __name__ == "__main__":
-    start = time.time()
+    start = time.clock()
     ## env config
     villa_path, junit_path, sys_classpath, agent_path, \
     pwd, proj_dir, go, dyng_go, fe_path, cust_mvn_repo = config_env()
@@ -247,8 +247,8 @@ if __name__ == "__main__":
     '''
         multi-stage analysis: Villa (code) and Center (invariants) 
     '''
-    set_up_time = time.time() - start
-    start_villa = time.time()
+    set_up_time = time.clock() - start
+    start_villa = time.clock()
     if config.profile_performance:
         profiler.run_and_report(
             "old_changed_methods, old_improved_changed_methods, old_added_changed_methods, \
@@ -265,8 +265,8 @@ if __name__ == "__main__":
         new_all_methods, new_l2m, new_m2l, \
         old_changed_tests, new_changed_tests = \
             villa.visit(villa_path, pwd, proj_dir, go, prev_hash, post_hash)
-    villa_time = time.time() - start_villa
-    start_agency = time.time()
+    villa_time = time.clock() - start_villa
+    start_agency = time.clock()
     #     # DEBUG ONLY
     #     print "Debug info: "
     #     print old_changed_methods
@@ -276,14 +276,14 @@ if __name__ == "__main__":
 
     targets = agency.investigate(old_all_methods, new_all_methods)
     # up to this point, "allmtd"'s still contain the methods without parameters and line numbers, but all others do
-    agency_invesitgate_time = time.time() - start_agency
+    agency_invesitgate_time = time.clock() - start_agency
     common_package = ''
     all_classes_set = set()
     old_test_set = set()
     old_refined_target_set = set()
     new_test_set = set()
     new_refined_target_set = set()
-    start_center = time.time()
+    start_center = time.clock()
     if config.profile_performance:
         profiler.run_and_report(
             "common_package, all_classes_set, all_refined_target_set, old_test_set, old_refined_target_set, new_test_set, new_refined_target_set, \
@@ -299,7 +299,7 @@ if __name__ == "__main__":
             center.visit(junit_path, sys_classpath, agent_path, cust_mvn_repo, separate_go, prev_hash, post_hash,
                          targets, iso, old_improved_changed_methods, old_changed_tests,
                          new_improved_changed_methods, new_changed_tests, json_filepath)
-    center_time = time.time() - start_center
+    center_time = time.clock() - start_center
     if json_filepath == "" or config.profile_performance:
         # only used for gallery, which is not run if we have a priority json file
         old_caller_of, old_callee_of = agency.caller_callee(go, prev_hash)
@@ -309,9 +309,9 @@ if __name__ == "__main__":
     '''
         before last: restore original branch and all its pending work
     '''
-    start_git_pop = time.time()
+    start_git_pop = time.clock()
     restore_and_pop_last(working_branch, should_further_recover)
-    print "time for git restore and pop: ", (time.time() - start_git_pop)
+    print "time for git restore and pop: ", (time.clock() - start_git_pop)
     '''
         optional: csi view results
     '''
@@ -329,7 +329,7 @@ if __name__ == "__main__":
                  prev_hash, post_hash, old_l2m, new_l2m, old_m2l, new_m2l)",
             go + "_getty_x_profile_gallery.profile")
     elif json_filepath == "":
-        start_gallery = time.time()
+        start_gallery = time.clock()
         gallery.exam(
             iso, pwd, go, fe_path, common_package, all_classes_set,
             targets, all_refined_target_set,
@@ -341,8 +341,8 @@ if __name__ == "__main__":
             all_changed_tests, old_changed_tests, new_changed_tests,
             old_test_set, new_test_set,
             prev_hash, post_hash, old_l2m, new_l2m, old_m2l, new_m2l)
-        print "time for gallery: ", (time.time() - start_gallery)
-    print "total time: ", (time.time() - start)
+        print "time for gallery: ", (time.clock() - start_gallery)
+    print "total time: ", (time.clock() - start)
     print "set_up time: ", set_up_time
     print "villa visit time: ", villa_time
     print "agency investigate time: ", agency_invesitgate_time
