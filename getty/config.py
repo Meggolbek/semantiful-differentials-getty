@@ -13,7 +13,7 @@ analyze_less_tests = True
 # whether to limit interested into a relatively smaller set
 limit_interest = True
 limit_distance = 3
-class_level_expansion = True
+class_level_expansion = False
 expansion_tmp_files = "_getty_temp_expansion_targets_"
 
 # scale parameters
@@ -43,9 +43,9 @@ output_inv_format = "Daikon"
 compress_inv = False
 
 # development options
-show_debug_info = True
+show_debug_info = False
 show_debug_details = False
-show_regex_debug = True
+show_regex_debug = False
 show_stack_trace_info = False
 
 # effortless mvn setup
