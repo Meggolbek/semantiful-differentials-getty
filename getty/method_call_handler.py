@@ -21,7 +21,6 @@ class MethodCallHandler(object):
         does_not_have_callees = True
         caller = caller + "("
         for m in method_calls.keys():
-            print "m: ", m[:len(caller)]
             if m[:len(caller)] == caller:
                 caller = m
                 does_not_have_callees = False
