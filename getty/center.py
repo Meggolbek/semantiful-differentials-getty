@@ -382,7 +382,7 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
     method_graph = method_call_handler.MethodCallHandler()
     method_calls = refine_method_calls(priorities, method_calls, method_graph)
     method_call_graph_for_tests = method_call_handler.MethodCallHandler()
-    methods_to_tests = create_method_to_tests(method_call_graph_for_tests, method_calls, testSuites)
+    methods_to_tests = create_method_to_tests(method_call_graph_for_tests, method_calls, testSuites, priorities)
     for priority in priorities:
         package = priority.split(":")
         # check if package name is a test suite. if so then it is a test.
@@ -514,16 +514,21 @@ def refine_method_calls(priorities, method_calls, method_graph):
 
     return method_calls
 
-def create_method_to_tests(method_call_graph_for_tests, method_calls, test_suites):
-    method_calls = method_call_graph_for_tests.flip_method_calls(method_calls)
-    methods_to_tests = method_call_graph_for_tests.extract_tests(test_suites, method_calls)
+
+def create_method_to_tests(method_call_graph_for_tests, method_calls, test_suites, priorities):
+    reversed_method_calls = method_call_graph_for_tests.flip_method_calls(method_calls)
+    for p in priorities:
+        reversed_method_calls = method_call_graph_for_tests.find_sub_calls(p, reversed_method_calls)
+    methods_to_tests = method_call_graph_for_tests.extract_tests(test_suites, reversed_method_calls)
     return methods_to_tests
 
+
 def update_methods_to_tests(method, method_calls, method_graph, test_suites):
-    method_calls = method_graph.find_sub_calls(method, method_calls)
     reversed_calls = method_graph.flip_method_calls(method_calls)
+    reversed_calls = method_graph.find_sub_calls(method, reversed_calls)
     methods_to_tests = method_graph.extract_tests(test_suites, reversed_calls)
     return methods_to_tests
+
 
 # one pass template
 def one_inv_pass(go, cp, junit_torun, this_hash, refined_target_set, test_selection, analysis_only=False):
