@@ -20,7 +20,6 @@ class MethodCallHandler(object):
         # check if caller has callees
         does_not_have_callees = True
         caller = caller + "("
-        print "caller: ", caller
         for m in method_calls.keys():
             print "m: ", m[:len(caller)]
             if m[:len(caller)] == caller:
@@ -28,9 +27,7 @@ class MethodCallHandler(object):
                 does_not_have_callees = False
         # if caller does not have callees just return
         if does_not_have_callees:
-            print "jere"
             return method_calls
-        print "method calls [caller]: ", method_calls[caller]
         for sub_method in method_calls[caller]:
             # call find_sub_calls on callee
             recursive_result = self.find_sub_calls(sub_method, method_calls)
