@@ -397,19 +397,7 @@ def get_tests_and_target_set(go, json_filepath, junit_torun, this_hash):
         # else priority is not a test
         else:
             target_set, test_set = add_to_targetset(methods_to_tests, priority, target_set, test_set, types_to_methods)
-    # for each method in target set check if it calls another method
-    # if so add that method to target set
-    # !!!!!!!! may not need this part of the code
-    check_target_set = copy.deepcopy(target_set)
-    for target in check_target_set:
-        method_name = target.split("-")[0] + "("
-        for method in method_calls.keys():
-            if method[:len(method_name)] == method_name:
-                for callee in method_calls[method]:
-                    callee_name = callee[:(callee.rfind("("))]
-                    update_methods_to_tests(method, method_calls, method_graph, testSuites)
-                    target_set, test_set = add_to_targetset(methods_to_tests, callee_name, target_set, test_set,
-                                                            types_to_methods)
+
     # need to add tests that eventually call target set. Backward tracing though dyn. call graph to obtain test
     # add each corresponding junit suite to junit to run
     tests_for_junit = set()
